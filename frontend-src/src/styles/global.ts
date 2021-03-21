@@ -1,6 +1,13 @@
 import { createGlobalStyle } from 'styled-components';
 
-export const GlobalStyle = createGlobalStyle`
+interface GlobalStyleProps {
+    background: {
+        url: string;
+        copyright: string;
+    }
+}
+
+export const GlobalStyle = createGlobalStyle<GlobalStyleProps>`
     :root {
         --background: #121214;
     }
@@ -22,7 +29,13 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     body {
+        min-height: 100vh;
+        
         background-color: var(--background);
+        background-image: url('https://bing.com${props => props.background.url}');
+        background-position: center;
+        background-size: cover;
+
         -webkit-font-smoothing: antialiased;
     }
 
