@@ -49,7 +49,7 @@ export default function Home() {
       {error && <Text>Problema no vídeo!</Text>}
 
       {!isLoading && (
-        <Flex>
+        <>
           <chakra.video
             width="100%"
             height="100%"
@@ -79,7 +79,7 @@ export default function Home() {
           >
             {videoData?.copyright}
           </Text>
-        </Flex>
+        </>
       )}
     </Flex>
   );
