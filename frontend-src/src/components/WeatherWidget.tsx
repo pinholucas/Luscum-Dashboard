@@ -1,7 +1,6 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { allOrigins, randomNumber, weatherURL } from "../utils";
+import { Flex, Spinner, Text } from '@chakra-ui/react';
+import { useWeather } from 'hooks/useWeather';
+import { useEffect, useState } from 'react';
 
 type weatherData = {
   temp: number;
@@ -15,20 +14,7 @@ type weatherData = {
 export default function WeatherWidget() {
   const [weatherData, setWeatherData] = useState<weatherData>();
 
-  const { data, isLoading, isFetching, error } = useQuery(
-    "weather",
-    async () => {
-      const response = await fetch(
-        allOrigins(weatherURL + `&bypass=${randomNumber(1, 999)}`)
-      );
-      const data = await response.json();
-
-      return data;
-    },
-    {
-      staleTime: 1000 * 1500, // 15 min
-    }
-  );
+  const { data, isLoading, isFetching, error } = useWeather();
 
   useEffect(() => {
     if (data) {
@@ -55,12 +41,12 @@ export default function WeatherWidget() {
             <Spinner color="white" size="sm" />
           ) : (
             <Text color="white" fontSize="2xl">
-              {error ? "-" : weatherData?.temp}
+              {error ? '-' : weatherData?.temp}
             </Text>
           )}
 
           <Text mt="2px" alignSelf="flex-start" color="white" fontSize="lg">
-            {" "}
+            {' '}
             °C
           </Text>
         </Flex>
