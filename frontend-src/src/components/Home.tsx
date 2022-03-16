@@ -2,6 +2,7 @@ import { Box, chakra, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { NTPType } from "../entities";
+import { allOrigins, mainConfigURL, randomNumber } from "../utils";
 import WeatherWidget from "./WeatherWidget";
 
 type videoType = {
@@ -13,10 +14,6 @@ type videoType = {
 
 export default function Home() {
   const [videoData, setVideoData] = useState<videoType>();
-
-  function randomNumber(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   const { data, isLoading, error } = useQuery<NTPType>("home", async () => {
     const response = await fetch(allOrigins(mainConfigURL));
