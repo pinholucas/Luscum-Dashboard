@@ -1,9 +1,8 @@
-import { Box, chakra, Flex, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { NTPType } from "../entities";
-import { allOrigins, mainConfigURL, randomNumber } from "../utils";
-import WeatherWidget from "./WeatherWidget";
+import { Box, chakra, Flex, Text } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { randomNumber } from '../utils';
+import WeatherWidget from './WeatherWidget';
+import { useHome } from 'hooks/useHome';
 
 type videoType = {
   firstFrame: string;
@@ -15,22 +14,17 @@ type videoType = {
 export default function Home() {
   const [videoData, setVideoData] = useState<videoType>();
 
-  const { data, isLoading, error } = useQuery<NTPType>("home", async () => {
-    const response = await fetch(allOrigins(mainConfigURL));
-    const data = await response.json();
-
-    return data;
-  });
+  const { data, isLoading, error } = useHome();
 
   useEffect(() => {
     if (data) {
       const videos =
-        data.configs["BackgroundImageWC/default"].properties.video.data;
+        data.configs['BackgroundImageWC/default'].properties.video.data;
 
       const videoIndex = randomNumber(0, videos.length - 1);
       const videoDescription =
-        data.configs["BackgroundImageWC/default"].properties.localizedStrings
-          .video_titles["video" + videoIndex];
+        data.configs['BackgroundImageWC/default'].properties.localizedStrings
+          .video_titles['video' + videoIndex];
 
       setVideoData({
         firstFrame: videos[videoIndex].firstFrame.i2160,
