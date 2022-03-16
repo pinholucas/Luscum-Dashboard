@@ -2,7 +2,7 @@ import { Box, chakra, Flex, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { NTPType } from "../entities";
-import { allOrigins, mainConfigURL } from "../utils";
+import WeatherWidget from "./WeatherWidget";
 
 type videoType = {
   firstFrame: string;
@@ -47,6 +47,8 @@ export default function Home() {
   return (
     <Flex width="100vw" height="100vh">
       {error && <Text>Problema no vídeo!</Text>}
+
+      <WeatherWidget />
 
       {!isLoading && (
         <>
