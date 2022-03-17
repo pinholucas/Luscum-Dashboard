@@ -1,6 +1,18 @@
-import { Flex, Image, Spinner, Text } from '@chakra-ui/react';
+import {
+  Flex,
+  Popover,
+  Image,
+  Spinner,
+  Text,
+  PopoverContent,
+  PopoverTrigger,
+  PopoverHeader,
+  PopoverBody,
+  Icon,
+} from '@chakra-ui/react';
 import { useWeather } from 'hooks/useWeather';
 import { useEffect, useState } from 'react';
+import { locationArrow } from 'utils';
 
 type alertType = {
   title: string;
@@ -31,8 +43,12 @@ type weatherData = {
   temp: number;
   feels: number;
   cloudCover: number;
+  umidity: number;
+  dewPoint: number;
   uv: number;
   uvDescription: string;
+  windSpeed: number;
+  windDirection: number;
   caption: string;
   icon: string;
   sourceData: sourceType;
@@ -92,8 +108,12 @@ export default function WeatherWidget() {
         temp: weather.current.temp,
         feels: weather.current.feels,
         cloudCover: weather.current.cloudCover,
+        umidity: weather.current.rh,
+        dewPoint: weather.current.dewPt,
         uv: weather.current.uv,
         uvDescription: weather.current.uvDesc,
+        windSpeed: weather.current.windSpd,
+        windDirection: weather.current.windDir,
         caption: weather.current.cap,
         icon: getWeatherIcon(weather.current.icon),
         sourceData: source,
@@ -102,37 +122,73 @@ export default function WeatherWidget() {
   }, [isLoading, data]);
 
   return (
-    <Flex position="absolute" top={4} left={4} alignItems="center">
+    <Flex position="absolute" top={4} left={4} alignItems="center" zIndex="3">
       {isLoading && <Spinner color="white" />}
 
       {!isLoading && (
-        <Flex alignItems="center">
-          {isFetching ? (
-            <Spinner color="white" size="sm" />
-          ) : (
-            <>
-              <Image
-                width="28px"
-                marginRight={1}
-                src={`./assets/weather/${weatherData?.icon}.svg`}
-              />
-              <Text color="white" fontSize="2xl" textShadow="0 0 2px black">
-                {error ? '-' : weatherData?.temp}
-              </Text>
-            </>
-          )}
+        <Popover trigger="hover" placement="bottom-start" isOpen>
+          <PopoverTrigger>
+            <Flex alignItems="center">
+              {isFetching ? (
+                <Spinner color="white" size="sm" />
+              ) : (
+                <>
+                  <Image
+                    width="28px"
+                    marginRight={1}
+                    src={`./assets/weather/${weatherData?.icon}.svg`}
+                  />
+                  <Text color="white" fontSize="2xl" textShadow="0 0 2px black">
+                    {error ? '-' : weatherData?.temp}
+                  </Text>
+                </>
+              )}
 
-          <Text
-            mt="2px"
-            alignSelf="flex-start"
-            color="white"
-            fontSize="lg"
-            textShadow="0 0 2px black"
+              <Text
+                mt="2px"
+                alignSelf="flex-start"
+                color="white"
+                fontSize="lg"
+                textShadow="0 0 2px black"
+              >
+                {' '}
+                °C
+              </Text>
+            </Flex>
+          </PopoverTrigger>
+          <PopoverContent
+            bgColor="primaryBackground"
+            borderColor="secondaryBackground"
+            color="gray.200"
           >
-            {' '}
-            °C
-          </Text>
-        </Flex>
+            <PopoverHeader
+              borderColor="secondaryBackground"
+              textAlign="center"
+            >{`${weatherData?.sourceData.location.Name}, ${weatherData?.sourceData.location.StateCode}`}</PopoverHeader>
+            <PopoverBody>
+              <Text>{`Clima: ${weatherData?.caption}`}</Text>
+              <Text>{`Sensação térmica: ${weatherData?.feels} °C`}</Text>
+              <Text>{`Radiação UV: ${
+                weatherData?.uv
+              } (${weatherData?.uvDescription.toLowerCase()})`}</Text>
+              <Text>{`Umidade: ${weatherData?.umidity}%`}</Text>
+              <Text>
+                {`Vento: ${weatherData?.windSpeed} km/h`}{' '}
+                <Icon
+                  boxSize={6}
+                  viewBox="0 -5 10 24"
+                  transform={`rotate(${
+                    Number(weatherData?.windDirection) - 180
+                  }deg)`}
+                  justifyContent="center"
+                >
+                  <path d={locationArrow} fill="white" />
+                </Icon>
+              </Text>
+              <Text>{`Ponto de orvalho: ${weatherData?.dewPoint} °C`}</Text>
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
       )}
     </Flex>
   );
