@@ -46,7 +46,7 @@ function getWeatherIcon(iconID: number) {
   switch (iconID) {
     // Day
     case 1:
-      return 'SunnyNightV3';
+      return 'SunnyDayV3';
     case 2:
       return 'MostlySunnyDay';
     case 3:
