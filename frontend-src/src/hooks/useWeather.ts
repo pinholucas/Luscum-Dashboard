@@ -81,7 +81,18 @@ function getWeatherIcon(iconID: number) {
   }
 }
 
-export async function getWeatherData() {
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+export async function getWeatherData(): Promise<weatherType> {
   const response = await fetch(
     allOrigins(weatherURL + `&bypass=${randomNumber(1, 999)}`),
   );
@@ -90,8 +101,22 @@ export async function getWeatherData() {
   const weather = data.responses[0].weather[0];
   const source = data.responses[0].source;
 
-  const weatherData: weatherType = {
-    alerts: weather.alerts,
+  const alerts = weather.alerts.map((alert: alertType) => {
+    return {
+      title: alert.title,
+      event: alert.event,
+      abbreviation: alert.abbreviation,
+      desc: alert.desc,
+      shortCap: alert.shortCap,
+      severity: alert.severity,
+      credit: alert.credit,
+      start: formatDate(alert.start),
+      end: formatDate(alert.end),
+    };
+  });
+
+  const weatherData = {
+    alerts: alerts,
     temp: weather.current.temp,
     feels: weather.current.feels,
     cloudCover: weather.current.cloudCover,
@@ -112,6 +137,6 @@ export async function getWeatherData() {
 
 export function useWeather() {
   return useQuery('weather', getWeatherData, {
-    staleTime: 1000 * 1500, // 15 min
+    staleTime: 1000 * 60 * 15, // 15 min
   });
 }
