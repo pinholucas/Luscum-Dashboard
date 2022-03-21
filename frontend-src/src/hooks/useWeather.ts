@@ -69,9 +69,11 @@ function getWeatherIcon(iconID: number) {
     // Rain & Cloudy
     case 5:
       return 'CloudyV3';
-    case 19 || 46: // 19 day, 46 night
+    case 19: // day
+    case 46: // night
       return 'LightRainV3';
-    case 22 || 49: // 22 day, 49 night
+    case 22: // day
+    case 49: // night
       return 'ModerateRainV2';
     case 27:
       return 'ThunderstormV3';
