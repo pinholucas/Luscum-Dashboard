@@ -31,5 +31,54 @@ export const theme = extendTheme({
     warning: '#ffd700',
   },
 
-  components: {},
+  components: {
+    Input: {
+      variants: {
+        outline: {
+          field: {
+            _focus: {
+              borderColor: 'alert',
+              boxShadow: '0 0 0 1px #E67E22',
+            },
+          },
+        },
+      },
+    },
+
+    Menu: {
+      baseStyle: {
+        list: {
+          padding: 0,
+          minWidth: 'max-content',
+          borderColor: 'secondaryBackground',
+          bgColor: 'background.600',
+          backdropFilter: 'blur(8px)',
+          color: 'gray.300',
+        },
+        item: {
+          _focus: {
+            bgColor: 'background.400',
+          },
+          _hover: {
+            bgColor: 'background.400',
+          },
+        },
+      },
+    },
+
+    Modal: {
+      baseStyle: {
+        bg: 'red',
+        overlay: {
+          backdropFilter: 'blur(8px)',
+        },
+        dialog: {
+          border: '1px solid',
+          borderColor: 'secondaryBackground',
+          bg: 'background.600',
+          color: 'gray.300',
+        },
+      },
+    },
+  },
 });

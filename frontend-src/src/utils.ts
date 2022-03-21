@@ -1,9 +1,12 @@
+export function randomNumber(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 export function allOrigins(url: string) {
   return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
 }
 
-export function randomNumber(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+export function getIconURL(url: string) {
+  return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=256`;
 }
 
 export const mainConfigURL =

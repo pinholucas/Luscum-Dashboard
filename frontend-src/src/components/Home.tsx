@@ -2,6 +2,7 @@ import { Box, chakra, Flex, Text } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { randomNumber } from '../utils';
 import WeatherWidget from './WeatherWidget';
+import TopSites from './TopSites/TopSites';
 import { useHome } from 'hooks/useHome';
 
 type videoType = {
@@ -40,6 +41,8 @@ export default function Home() {
       {error && <Text>Problema no vídeo!</Text>}
 
       <WeatherWidget />
+
+      <TopSites />
 
       {!isLoading && (
         <>
