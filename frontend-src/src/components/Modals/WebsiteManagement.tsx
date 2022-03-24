@@ -61,9 +61,7 @@ export default function WebsiteManagementModal({
             <Image
               width="40px"
               height="40px"
-              src={
-                type === 'add' ? '' : website?.icon ?? getIconURL(website?.url!)
-              }
+              src={website?.icon ?? getIconURL(website?.url!)}
             />
           )}
 
