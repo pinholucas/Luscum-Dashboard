@@ -45,6 +45,12 @@ export default function WebsiteManagementModal({
     setWebsite(null);
   }
 
+  function handleCancel() {
+    onClose();
+
+    setWebsite(null);
+  }
+
   useEffect(() => {
     setWebsite(websiteData);
   }, [websiteData]);
@@ -110,7 +116,7 @@ export default function WebsiteManagementModal({
               color: 'gray.800',
               bgColor: 'gray.300',
             }}
-            onClick={onClose}
+            onClick={handleCancel}
           >
             Cancelar
           </Button>
