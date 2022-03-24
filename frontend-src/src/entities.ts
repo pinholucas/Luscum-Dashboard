@@ -31,7 +31,7 @@ export type NTPType = {
 };
 
 export type WebsiteDataType = {
-  title: string;
-  icon: string | null;
-  url: string;
+  title?: string;
+  icon?: string | null;
+  url?: string;
 };

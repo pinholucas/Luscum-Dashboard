@@ -1,13 +1,69 @@
 import { Flex, Grid, Icon, useDisclosure } from '@chakra-ui/react';
-import WebsiteContainer from './WebsiteContainer';
 import { IoIosAdd } from 'react-icons/io';
-import WebsiteManagementModal from 'components/Modals/WebsiteManagement';
 import { WebsiteDataType } from 'entities';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import WebsiteContainer from './WebsiteContainer';
+import WebsiteManagementModal from 'components/Modals/WebsiteManagement';
 
 export default function TopSites() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [websitesList, setWebsiteList] = useState<WebsiteDataType[]>([]);
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: onOpenAddModal,
+    onClose: onCloseAddModal,
+  } = useDisclosure();
+  const {
+    isOpen: isEditModalOpen,
+    onOpen: onOpenEditModal,
+    onClose: onCloseEditModal,
+  } = useDisclosure();
+
+  const [websitesList, setWebsitesList] = useState<WebsiteDataType[]>(() => {
+    if (!localStorage.getItem('websitesList')) {
+      localStorage.setItem('websitesList', JSON.stringify([]));
+    }
+
+    const initialValue = localStorage.getItem('websitesList') ?? '';
+
+    return JSON.parse(initialValue);
+  });
+  const [editWebsiteData, setEditWebsiteData] = useState<WebsiteDataType>();
+  const [editWebsiteDataKey, setEditWebsiteDataKey] = useState<number>();
+
+  function handleOnOpenEditModal(websiteData: WebsiteDataType, key: number) {
+    onOpenEditModal();
+
+    setEditWebsiteData(websiteData);
+    setEditWebsiteDataKey(key);
+  }
+
+  function handleAdd(websiteData: WebsiteDataType) {
+    setWebsitesList([...websitesList, websiteData]);
+
+    onCloseAddModal();
+  }
+
+  function handleEdit(websiteData: WebsiteDataType) {
+    const newWebsitesList = websitesList.map((website, index) =>
+      index === editWebsiteDataKey ? websiteData : website,
+    );
+
+    setWebsitesList(newWebsitesList);
+
+    onCloseEditModal();
+  }
+
+  function handleRemove(key: number) {
+    const newWebsitesList = websitesList.filter(
+      (website, index) => index !== key,
+    );
+
+    setWebsitesList(newWebsitesList);
+  }
+
+  useEffect(() => {
+    localStorage.setItem('websitesList', JSON.stringify(websitesList));
+  }, [websitesList]);
 
   return (
     <Flex
@@ -20,15 +76,23 @@ export default function TopSites() {
     >
       <WebsiteManagementModal
         type="add"
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={() => {}}
+        isOpen={isAddModalOpen}
+        onClose={onCloseAddModal}
+        onSubmit={handleAdd}
+      />
+
+      <WebsiteManagementModal
+        type="edit"
+        isOpen={isEditModalOpen}
+        onClose={onCloseEditModal}
+        onSubmit={handleEdit}
+        websiteData={editWebsiteData}
       />
 
       <Grid
         w="75%"
         padding={4}
-        gridTemplateColumns="repeat(auto-fit, minmax(90px, 1fr))"
+        gridTemplateColumns="repeat(auto-fit, minmax(90px, 90px))"
         justifyItems="center"
         gap={4}
         border="1px solid"
@@ -37,8 +101,13 @@ export default function TopSites() {
         backgroundColor="primaryBackground"
         backdropFilter="blur(8px)"
       >
-        {websitesList.map((website, key) => (
-          <WebsiteContainer key={key} websiteData={website} />
+        {websitesList?.map((website, key) => (
+          <WebsiteContainer
+            key={key}
+            onOpenEditModal={() => handleOnOpenEditModal(website, key)}
+            onRemove={() => handleRemove(key)}
+            websiteData={website}
+          />
         ))}
 
         <Flex
@@ -63,7 +132,7 @@ export default function TopSites() {
               color: 'gray.50',
             },
           }}
-          onClick={onOpen}
+          onClick={onOpenAddModal}
         >
           <Icon
             as={IoIosAdd}

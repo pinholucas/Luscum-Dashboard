@@ -6,29 +6,55 @@ import {
   FormLabel,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/react';
-import { WebsiteDataType } from 'entities';
+import { useEffect, useState } from 'react';
 import { getIconURL } from 'utils';
+
+import { WebsiteDataType } from 'entities';
 
 interface WebsiteManagementModalProps {
   type: 'add' | 'edit';
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: WebsiteDataType) => void;
   websiteData?: WebsiteDataType;
 }
 
 export default function WebsiteManagementModal({
   type,
-  websiteData,
   isOpen,
   onClose,
+  onSubmit,
+  websiteData,
 }: WebsiteManagementModalProps) {
+  const [website, setWebsite] = useState<WebsiteDataType | null>();
+
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value, name } = event.currentTarget;
+
+    setWebsite({ ...website, [name]: value });
+  }
+
+  function handleInputBlur(event: React.FocusEvent<HTMLInputElement>) {
+    const { value, name } = event.currentTarget;
+
+    setWebsite({ ...website, [name]: value });
+  }
+
+  function handleSubmit() {
+    onSubmit(website!);
+
+    setWebsite(null);
+  }
+
+  useEffect(() => {
+    setWebsite(websiteData);
+  }, [websiteData]);
+
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -37,26 +63,36 @@ export default function WebsiteManagementModal({
           {`${type === 'add' ? 'Adicionar' : 'Editar'} site`}
         </ModalHeader>
         <ModalBody pb={6}>
-          {(websiteData?.url || websiteData?.icon) && (
+          {(website?.url || website?.icon) && (
             <Image
               width="40px"
               height="40px"
               src={
-                type === 'add'
-                  ? ''
-                  : websiteData!.icon ?? getIconURL(websiteData!.url)
+                type === 'add' ? '' : website?.icon ?? getIconURL(website?.url!)
               }
             />
           )}
 
           <FormControl mt={4}>
             <FormLabel>Título</FormLabel>
-            <Input placeholder="Título do ícone" value={websiteData?.title} />
+            <Input
+              name="title"
+              placeholder="Título do ícone"
+              value={website?.title}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+            />
           </FormControl>
 
           <FormControl mt={4}>
             <FormLabel>Url</FormLabel>
-            <Input placeholder="Url do site" value={websiteData?.url} />
+            <Input
+              name="url"
+              placeholder="Url do site"
+              value={website?.url}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+            />
           </FormControl>
         </ModalBody>
 
@@ -71,6 +107,7 @@ export default function WebsiteManagementModal({
               bgColor: 'alert',
               color: 'gray.200',
             }}
+            onClick={handleSubmit}
           >
             {type === 'add' ? 'Adicionar' : 'Alterar'}
           </Button>

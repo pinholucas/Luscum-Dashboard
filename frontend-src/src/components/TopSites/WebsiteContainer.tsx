@@ -7,38 +7,26 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useDisclosure,
 } from '@chakra-ui/react';
-import { WebsiteDataType } from 'entities';
-import React from 'react';
-
 import { BiDotsHorizontalRounded } from 'react-icons/bi';
 import { FiTrash, FiEdit2 } from 'react-icons/fi';
 import { getIconURL } from 'utils';
 
-import WebsiteManagementModal from '../Modals/WebsiteManagement';
+import { WebsiteDataType } from 'entities';
 
 interface WebsiteContainerProps {
+  onOpenEditModal: () => void;
+  onRemove: () => void;
   websiteData: WebsiteDataType;
 }
 
 export default function WebsiteContainer({
+  onOpenEditModal,
+  onRemove,
   websiteData,
 }: WebsiteContainerProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const handleClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-  };
   return (
     <>
-      <WebsiteManagementModal
-        type="edit"
-        websiteData={websiteData}
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={() => {}}
-      />
-
       <Flex
         position="relative"
         height="80px"
@@ -71,15 +59,16 @@ export default function WebsiteContainer({
             _expanded={{
               bgColor: 'background.600',
             }}
-            onClick={handleClick}
           >
             <BiDotsHorizontalRounded />
           </MenuButton>
           <MenuList>
-            <MenuItem icon={<FiEdit2 />} onClick={onOpen}>
+            <MenuItem icon={<FiEdit2 />} onClick={onOpenEditModal}>
               Editar
             </MenuItem>
-            <MenuItem icon={<FiTrash />}>Remover</MenuItem>
+            <MenuItem icon={<FiTrash />} onClick={onRemove}>
+              Remover
+            </MenuItem>
           </MenuList>
         </Menu>
 
@@ -88,6 +77,8 @@ export default function WebsiteContainer({
           width="100%"
           h="100%"
           textDecoration="none"
+          overflow="hidden"
+          boxSizing="border-box"
           _focus={{ outline: 'none' }}
         >
           <Flex
@@ -100,9 +91,17 @@ export default function WebsiteContainer({
             <Image
               width="40px"
               height="40px"
-              src={websiteData.icon ?? getIconURL(websiteData.url)}
+              src={websiteData.icon ?? getIconURL(websiteData.url!)}
             />
-            <Text color="white" fontSize="xs">
+            <Text
+              width="75px"
+              color="white"
+              fontSize="xs"
+              textAlign="center"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+              overflow="hidden"
+            >
               {websiteData.title}
             </Text>
           </Flex>
