@@ -39,12 +39,6 @@ export default function WebsiteManagementModal({
     setWebsite({ ...website, [name]: value });
   }
 
-  function handleInputBlur(event: React.FocusEvent<HTMLInputElement>) {
-    const { value, name } = event.currentTarget;
-
-    setWebsite({ ...website, [name]: value });
-  }
-
   function handleSubmit() {
     onSubmit(website!);
 
@@ -80,7 +74,6 @@ export default function WebsiteManagementModal({
               placeholder="Título do ícone"
               value={website?.title}
               onChange={handleInputChange}
-              onBlur={handleInputBlur}
             />
           </FormControl>
 
@@ -88,10 +81,9 @@ export default function WebsiteManagementModal({
             <FormLabel>Url</FormLabel>
             <Input
               name="url"
-              placeholder="Url do site"
+              placeholder="https://example.com"
               value={website?.url}
               onChange={handleInputChange}
-              onBlur={handleInputBlur}
             />
           </FormControl>
         </ModalBody>
