@@ -1,10 +1,30 @@
 import { Flex, Grid, Icon, useDisclosure } from '@chakra-ui/react';
 import { IoIosAdd } from 'react-icons/io';
 import { WebsiteDataType } from 'entities';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+import { ReactSortable } from 'react-sortablejs';
 
 import WebsiteContainer from './WebsiteContainer';
 import WebsiteManagementModal from 'components/Modals/WebsiteManagement';
+
+const WebsitesGrid = forwardRef<HTMLDivElement, any>((props, ref) => {
+  return (
+    <Grid
+      padding={4}
+      gridTemplateColumns="repeat(7, minmax(90px, 90px))"
+      justifyItems="center"
+      gap={4}
+      border="1px solid"
+      borderColor="gray.600"
+      borderRadius={8}
+      backgroundColor="primaryBackground"
+      backdropFilter="blur(8px)"
+      ref={ref}
+    >
+      {props.children}
+    </Grid>
+  );
+});
 
 export default function TopSites() {
   const {
@@ -89,20 +109,15 @@ export default function TopSites() {
         websiteData={editWebsiteData}
       />
 
-      <Grid
-        w="75%"
-        padding={4}
-        gridTemplateColumns="repeat(auto-fit, minmax(90px, 90px))"
-        justifyItems="center"
-        gap={4}
-        border="1px solid"
-        borderColor="gray.600"
-        borderRadius={8}
-        backgroundColor="primaryBackground"
-        backdropFilter="blur(8px)"
+      <ReactSortable
+        tag={WebsitesGrid}
+        list={websitesList}
+        setList={setWebsitesList}
+        draggable="#website-container"
       >
         {websitesList?.map((website, key) => (
           <WebsiteContainer
+            id="website-container"
             key={key}
             onOpenEditModal={() => handleOnOpenEditModal(website, key)}
             onRemove={() => handleRemove(key)}
@@ -141,7 +156,7 @@ export default function TopSites() {
             fontWeight="light"
           />
         </Flex>
-      </Grid>
+      </ReactSortable>
     </Flex>
   );
 }

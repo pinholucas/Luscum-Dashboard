@@ -12,8 +12,9 @@ import {
   ModalOverlay,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { getIconURL } from 'utils';
+import { nanoid } from 'nanoid';
 
+import { getIconURL } from 'utils';
 import { WebsiteDataType } from 'entities';
 
 interface WebsiteManagementModalProps {
@@ -35,8 +36,9 @@ export default function WebsiteManagementModal({
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value, name } = event.currentTarget;
+    const id = website?.id ?? nanoid();
 
-    setWebsite({ ...website, [name]: value });
+    setWebsite({ ...website, id: id, [name]: value });
   }
 
   function handleSubmit() {

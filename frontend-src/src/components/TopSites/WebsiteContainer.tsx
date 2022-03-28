@@ -15,12 +15,14 @@ import { getIconURL } from 'utils';
 import { WebsiteDataType } from 'entities';
 
 interface WebsiteContainerProps {
+  id: string;
   onOpenEditModal: () => void;
   onRemove: () => void;
   websiteData: WebsiteDataType;
 }
 
 export default function WebsiteContainer({
+  id,
   onOpenEditModal,
   onRemove,
   websiteData,
@@ -28,6 +30,7 @@ export default function WebsiteContainer({
   return (
     <>
       <Flex
+        id={id}
         position="relative"
         height="80px"
         width="90px"
@@ -38,6 +41,7 @@ export default function WebsiteContainer({
         borderColor="gray.600"
         borderRadius={8}
         cursor="pointer"
+        userSelect={'none'}
         _hover={{
           borderColor: 'gray.500',
           '& > button': {
@@ -79,6 +83,9 @@ export default function WebsiteContainer({
           textDecoration="none"
           overflow="hidden"
           boxSizing="border-box"
+          _hover={{
+            textDecoration: 'none',
+          }}
           _focus={{ outline: 'none' }}
         >
           <Flex
