@@ -36,3 +36,9 @@ export type WebsiteDataType = {
   icon?: string | null;
   url?: string;
 };
+
+export type LocationType = {
+  lat: number;
+  lon: number;
+  name: string;
+};

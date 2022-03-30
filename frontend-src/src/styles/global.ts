@@ -45,6 +45,17 @@ export const theme = extendTheme({
       },
     },
 
+    Editable: {
+      baseStyle: {
+        input: {
+          _focus: {
+            borderColor: 'alert',
+            boxShadow: '0 0 0 2px #E67E22',
+          },
+        },
+      },
+    },
+
     Menu: {
       baseStyle: {
         list: {

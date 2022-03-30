@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { allOrigins, randomNumber, weatherURL } from 'utils';
+import { allOrigins, getWeatherURL } from 'utils';
 
 type alertType = {
   title: string;
@@ -95,9 +95,7 @@ function formatDate(date: string) {
 }
 
 export async function getWeatherData(): Promise<weatherType> {
-  const response = await fetch(
-    allOrigins(weatherURL + `&bypass=${randomNumber(1, 999)}`),
-  );
+  const response = await fetch(allOrigins(getWeatherURL()));
   const data = await response.json();
 
   const weather = data.responses[0].weather[0];
@@ -117,7 +115,7 @@ export async function getWeatherData(): Promise<weatherType> {
     };
   });
 
-  const weatherData = {
+  const weatherData: weatherType = {
     alerts: alerts,
     temp: weather.current.temp,
     feels: weather.current.feels,
