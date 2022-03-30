@@ -10,7 +10,7 @@
 
 # production
 /build
-../extension-pack
+.vscode
 
 # misc
 .DS_Store
