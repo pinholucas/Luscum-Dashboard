@@ -4,6 +4,7 @@ import { randomNumber } from '../utils';
 import WeatherWidget from './WeatherWidget';
 import TopSites from './TopSites/TopSites';
 import { useHome } from 'hooks/useHome';
+import SettingsWidget from './SettingsWidget';
 
 type videoType = {
   firstFrame: string;
@@ -41,6 +42,8 @@ export default function Home() {
       {error && <Text>Problema no vídeo!</Text>}
 
       <WeatherWidget />
+
+      <SettingsWidget />
 
       <TopSites />
 

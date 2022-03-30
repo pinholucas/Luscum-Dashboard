@@ -6,12 +6,15 @@ import { ReactSortable } from 'react-sortablejs';
 
 import WebsiteContainer from './WebsiteContainer';
 import WebsiteManagementModal from 'components/Modals/WebsiteManagement';
+import { useSettings } from 'hooks/useSettings';
 
 const WebsitesGrid = forwardRef<HTMLDivElement, any>((props, ref) => {
+  const { settings } = useSettings();
+
   return (
     <Grid
       padding={4}
-      gridTemplateColumns="repeat(7, minmax(90px, 90px))"
+      gridTemplateColumns={`repeat(${settings.columns}, minmax(90px, 90px))`}
       justifyItems="center"
       gap={4}
       border="1px solid"
