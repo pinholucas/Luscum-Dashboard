@@ -38,7 +38,11 @@ export default function WebsiteManagementModal({
     const { value, name } = event.currentTarget;
     const id = website?.id ?? nanoid();
 
-    setWebsite({ ...website, id: id, [name]: value });
+    setWebsite({
+      ...website,
+      id: id,
+      [name]: value === '' ? null : value,
+    });
   }
 
   function handleSubmit() {
@@ -74,6 +78,16 @@ export default function WebsiteManagementModal({
           )}
 
           <FormControl mt={4}>
+            <FormLabel>Ícone Personalizado (opcional)</FormLabel>
+            <Input
+              name="icon"
+              placeholder="ex: https://example.com"
+              value={website?.icon}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+
+          <FormControl mt={4}>
             <FormLabel>Título</FormLabel>
             <Input
               name="title"
@@ -87,7 +101,7 @@ export default function WebsiteManagementModal({
             <FormLabel>Url</FormLabel>
             <Input
               name="url"
-              placeholder="https://example.com"
+              placeholder="ex: https://example.com"
               value={website?.url}
               onChange={handleInputChange}
             />
