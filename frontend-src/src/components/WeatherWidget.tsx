@@ -155,7 +155,7 @@ export default function WeatherWidget() {
           <Popover
             trigger="hover"
             placement="bottom-start"
-            onClose={() => setLocationEditMode(false)}
+            onClose={handleInputCancelChange}
           >
             <PopoverTrigger>
               <Flex alignItems="center" cursor="pointer">
