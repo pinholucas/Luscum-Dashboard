@@ -29,11 +29,9 @@ Attention: The extension uses Microsoft public APPID & ApiKey, if they change it
 - React JS
 - Chakra-UI
 
-<img src="./screenshots/1.png" alt="Screenshot main screen" width="100%" >
-
-<img src="./screenshots/2.png" alt="Screenshot website edit" width="100%">
-
-<img src="./screenshots/3.png" alt="Screenshot weather info" width="100%">
+![Screenshot main screen](./screenshots/1.png)
+![Screenshot website edit](./screenshots/2.png)
+![Screenshot weather info](./screenshots/3.png)
 
 <!-- GETTING STARTED -->
 
