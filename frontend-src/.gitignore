@@ -10,7 +10,7 @@
 
 # production
 /build
-/src/old files
+../extension-pack
 
 # misc
 .DS_Store
