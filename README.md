@@ -1,7 +1,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center"></p>
-  <h3 style="font-size: 32px; font-weight: bold;" align="center">Luscum Dashboard</h3>
+  <h1 style=" font-weight: bold;" align="center">Luscum Dashboard</h1>
 
   <p style="text" align="center">
     Why Momentum if you can have Luscum?
