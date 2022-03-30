@@ -1,6 +1,10 @@
-import { LocationType } from 'entities';
+import { LocationType, SettingsType } from 'entities';
 
-export const settingsData = JSON.parse(localStorage.getItem('settings') ?? '');
+const defaultSettings: SettingsType = {
+  columns: 7,
+  appID: 'EDEC3CB74CF190BBBE26DF7938F3D961E925F593',
+  apikey: 'UhJ4G66OjyLbn9mXARgajXLiLw6V75sHnfpU60aJBB',
+};
 
 export const mainConfigURL =
   'https://ntp.msn.com/resolver/api/resolve/v3/config/?expType=AppConfig&expInstance=default&apptype=edgeChromium&v=20220314.291&targetScope={"audienceMode":"adult","browser":{"browserType":"edgeChromium","version":"100","ismobile":"false"},"deviceFormFactor":"desktop","domain":"ntp.msn.com","locale":{"content":{"language":"pt","market":"br"},"display":{"language":"pt","market":"br"}},"os":"windows","platform":"web","pageType":"ntp","pageExperiments":["prg-1s-p2pre","prg-1sw-accu10c","prg-1sw-cfi2c","prg-1sw-dsbl-prerend","prg-1sw-ep-g","prg-1sw-gevte","prg-1sw-grevtt","prg-1sw-hdukr","prg-1sw-l2icon","prg-1sw-nen3di","prg-1sw-newsbkt","prg-1sw-newsprec","prg-1sw-newspreviewc","prg-1sw-newsskipc","prg-1sw-oly-rev-cf","prg-1sw-spdiscarscf","prg-1sw-splog","prg-1sw-swsvg","prg-1sw-swsvg2","prg-1sw-swsvg3","prg-1sw-swsvg4","prg-adspeek","prg-esxboxt","prg-fin-cqlx","prg-fin-gm","prg-hp-grablue","prg-hp-tsc","prg-ias","prg-ndualauth","prg-nodualauth","prg-nofcsvtcc","prg-prn-admix4","prg-prong2-aa","prg-ssprime-c","prg-upsaip-w-t","prg-wea-nortate","prg-wpo-ifp-c","prg-wpo-sovfuz-c","prg-wtch-prev-t","prg-wtchrr1"]}';
@@ -22,7 +26,16 @@ export function getIconURL(url: string) {
   return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${url}&size=256`;
 }
 
+export function getSettingsData(): SettingsType {
+  if (!localStorage.getItem('settings')) {
+    localStorage.setItem('settings', JSON.stringify(defaultSettings));
+  }
+
+  return JSON.parse(localStorage.getItem('settings')!);
+}
+
 export function getWeatherURL() {
+  const settingsData = getSettingsData();
   const location = getWeatherLocation();
   const sillymagic = randomNumber(1, 1000);
 
@@ -40,6 +53,8 @@ export function getWeatherLocation(): LocationType {
 }
 
 export function getPlacesData(query: string) {
+  const settingsData = getSettingsData();
+
   if (settingsData.appID) {
     return `https://www.bing.com/api/v6/Places/AutoSuggest?appid=${settingsData.appID}&q=${query}&setmkt=pt-br&setlang=pt-br&types=Place&abbrtext=1&structuredaddress=true&strucaddrread=1`;
   }

@@ -42,3 +42,9 @@ export type LocationType = {
   lon: number;
   name: string;
 };
+
+export type SettingsType = {
+  columns: number;
+  appID: string;
+  apikey: string;
+};
