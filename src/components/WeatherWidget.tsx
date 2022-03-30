@@ -42,7 +42,7 @@ function EditableControls() {
       justifySelf="center"
       {...getEditButtonProps()}
     >
-      <FiEdit2 />
+      <FiEdit2 size="18" />
     </Box>
   );
 }

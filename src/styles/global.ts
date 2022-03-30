@@ -3,6 +3,10 @@ import { extendTheme } from '@chakra-ui/react';
 export const theme = extendTheme({
   styles: {
     global: {
+      '*': {
+        fontSize: '1rem',
+      },
+
       'html, body': {
         bgColor: 'gray.900',
       },
