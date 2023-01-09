@@ -8,6 +8,7 @@ type alertType = {
   desc: string;
   shortCap: string;
   severity: string;
+  safetyGuide: string;
   credit: string;
   start: string;
   end: string;
@@ -25,7 +26,7 @@ type sourceType = {
   };
 };
 
-type weatherType = {
+export type weatherType = {
   alerts: alertType[];
   temp: number;
   feels: number;
@@ -39,6 +40,7 @@ type weatherType = {
   windDirection: number;
   caption: string;
   icon: string;
+  nowCasting: string;
   sourceData: sourceType;
 };
 
@@ -110,6 +112,7 @@ export async function getWeatherData(): Promise<weatherType> {
       shortCap: alert.shortCap,
       severity: alert.severity,
       credit: alert.credit,
+      safetyGuide: alert.safetyGuide,
       start: formatDate(alert.start),
       end: formatDate(alert.end),
     };
@@ -129,6 +132,7 @@ export async function getWeatherData(): Promise<weatherType> {
     windDirection: weather.current.windDir,
     caption: weather.current.cap,
     icon: getWeatherIcon(weather.current.icon),
+    nowCasting: weather.nowcasting.summary,
     sourceData: source,
   };
 

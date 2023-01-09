@@ -30,6 +30,8 @@ import {
   locationArrow,
   weatherAlert,
 } from 'utils';
+import { WeatherAlertContent } from './WeatherAlertContent';
+import { IoMdInformationCircleOutline } from 'react-icons/io';
 
 function EditableControls() {
   const { getEditButtonProps } = useEditableControls();
@@ -130,24 +132,7 @@ export default function WeatherWidget() {
                 borderColor="secondaryBackground"
                 color="gray.200"
               >
-                <PopoverHeader
-                  borderColor="secondaryBackground"
-                  color="alert"
-                  fontWeight="bold"
-                  textAlign="center"
-                  textTransform="uppercase"
-                  textShadow="0 0 2px black"
-                >
-                  {data?.alerts[0].title}
-                </PopoverHeader>
-                <PopoverBody>
-                  <Text>{`De: ${data?.alerts[0].start}`}</Text>
-                  <Text>{`Até: ${data?.alerts[0].end}`}</Text>
-
-                  <Divider my={2} borderColor="secondaryBackground" />
-
-                  <Text>{`${data?.alerts[0].desc}`}</Text>
-                </PopoverBody>
+                <WeatherAlertContent data={data!} />
               </PopoverContent>
             </Popover>
           )}
@@ -208,6 +193,7 @@ export default function WeatherWidget() {
                 alignItems="center"
                 justifyContent="center"
                 borderColor="secondaryBackground"
+                backgroundColor="rgba(50,50,50,.2)"
                 textAlign="center"
                 userSelect="none"
                 cursor="pointer"
@@ -273,6 +259,17 @@ export default function WeatherWidget() {
                       </Icon>
                     </Text>
                     <Text>{`Ponto de orvalho: ${data?.dewPoint} °C`}</Text>
+
+                    {data?.nowCasting && (
+                      <>
+                        <Divider my={2} borderColor="secondaryBackground" />
+
+                        <Flex alignItems="center" gap={2}>
+                          <IoMdInformationCircleOutline />
+                          <Text>{`${data?.nowCasting}`}</Text>
+                        </Flex>
+                      </>
+                    )}
                   </>
                 ) : locationsList.length > 0 ? (
                   <List>

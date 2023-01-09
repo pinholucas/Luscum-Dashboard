@@ -43,12 +43,12 @@ To get a local copy up and running follow these simple steps.
 
 - Chromium browser
 
-### Instalation (Release)
+### Installation (Release)
 
 1. Download the lastest version from Releases section.
 2. Enable developer mode in extensions screen of the browser & load the folder as an unpacked extension.
 
-### Instalation (Source code)
+### Installation (Source code)
 
 1. Clone the repository.
 2. Execute: 'yarn install' and after 'yarn build'
