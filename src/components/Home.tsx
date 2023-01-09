@@ -56,7 +56,7 @@ export default function Home() {
             autoPlay
             loop
             muted
-            src={videoData?.videoUrl}
+            src={`https://prod-streaming-video-msn-com.akamaized.net/${videoData?.videoUrl}.mp4`}
           />
 
           <Box position="absolute" width="100%" height="100%" />

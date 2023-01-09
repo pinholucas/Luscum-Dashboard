@@ -1,9 +1,9 @@
 import { NTPType } from 'entities';
 import { useQuery } from 'react-query';
-import { allOrigins, mainConfigURL } from 'utils';
+import { backgroundDataURL } from 'utils';
 
 export async function getHomeData(): Promise<NTPType> {
-  const response = await fetch(allOrigins(mainConfigURL));
+  const response = await fetch(backgroundDataURL);
   const data = await response.json();
 
   return data;

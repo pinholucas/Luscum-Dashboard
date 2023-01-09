@@ -7,7 +7,10 @@ const defaultSettings: SettingsType = {
 };
 
 export const mainConfigURL =
-  'https://ntp.msn.com/resolver/api/resolve/v3/config/?expType=AppConfig&expInstance=default&apptype=edgeChromium&v=20220314.291&targetScope={"audienceMode":"adult","browser":{"browserType":"edgeChromium","version":"100","ismobile":"false"},"deviceFormFactor":"desktop","domain":"ntp.msn.com","locale":{"content":{"language":"pt","market":"br"},"display":{"language":"pt","market":"br"}},"os":"windows","platform":"web","pageType":"ntp","pageExperiments":["prg-1s-p2pre","prg-1sw-accu10c","prg-1sw-cfi2c","prg-1sw-dsbl-prerend","prg-1sw-ep-g","prg-1sw-gevte","prg-1sw-grevtt","prg-1sw-hdukr","prg-1sw-l2icon","prg-1sw-nen3di","prg-1sw-newsbkt","prg-1sw-newsprec","prg-1sw-newspreviewc","prg-1sw-newsskipc","prg-1sw-oly-rev-cf","prg-1sw-spdiscarscf","prg-1sw-splog","prg-1sw-swsvg","prg-1sw-swsvg2","prg-1sw-swsvg3","prg-1sw-swsvg4","prg-adspeek","prg-esxboxt","prg-fin-cqlx","prg-fin-gm","prg-hp-grablue","prg-hp-tsc","prg-ias","prg-ndualauth","prg-nodualauth","prg-nofcsvtcc","prg-prn-admix4","prg-prong2-aa","prg-ssprime-c","prg-upsaip-w-t","prg-wea-nortate","prg-wpo-ifp-c","prg-wpo-sovfuz-c","prg-wtch-prev-t","prg-wtchrr1"]}';
+  'https://ntp.msn.com/resolver/api/resolve/v3/config/?expType=AppConfig&apptype=edgeChromium&v=20230106.366&targetScope={"audienceMode":"adult","browser":{"version":"110","ismobile":"false"},"locale":{"content":{"language":"pt","market":"br"},"display":{"language":"pt","market":"br"}}}';
+
+export const backgroundDataURL =
+  'https://raw.githubusercontent.com/pinholucas/Luscum-Dashboard/master/api.json';
 
 export const locationArrow = 'M5 0L9.66895 14L5 9.33105L0.331055 14L5 0Z';
 export const weatherAlert = [
