@@ -1,6 +1,7 @@
 import { LocationType, SettingsType } from 'entities';
 
 const defaultSettings: SettingsType = {
+  adaptTopSitesWidth: true,
   columns: 7,
   appID: 'EDEC3CB74CF190BBBE26DF7938F3D961E925F593',
   apikey: 'UhJ4G66OjyLbn9mXARgajXLiLw6V75sHnfpU60aJBB',
@@ -33,6 +34,16 @@ export function getSettingsData(): SettingsType {
   if (!localStorage.getItem('settings')) {
     localStorage.setItem('settings', JSON.stringify(defaultSettings));
   }
+
+  let localStorageSettings = JSON.parse(localStorage.getItem('settings')!);
+
+  for (const [key, value] of Object.entries(defaultSettings)) {
+    if (localStorageSettings[key] === undefined) {
+      localStorageSettings[key] = value;
+    }
+  }
+
+  localStorage.setItem('settings', JSON.stringify(localStorageSettings));
 
   return JSON.parse(localStorage.getItem('settings')!);
 }

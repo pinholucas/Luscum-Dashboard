@@ -7,14 +7,21 @@ import { ReactSortable } from 'react-sortablejs';
 import WebsiteContainer from './WebsiteContainer';
 import WebsiteManagementModal from 'components/Modals/WebsiteManagement';
 import { useSettings } from 'hooks/useSettings';
+import { useStorageData } from 'hooks/useStorageData';
 
 const WebsitesGrid = forwardRef<HTMLDivElement, any>((props, ref) => {
   const { settings } = useSettings();
+  const { websitesList } = useStorageData();
+
+  const columns =
+    websitesList.length < settings.columns && settings.adaptTopSitesWidth
+      ? websitesList.length + 1
+      : settings.columns;
 
   return (
     <Grid
       padding={4}
-      gridTemplateColumns={`repeat(${settings.columns}, minmax(90px, 90px))`}
+      gridTemplateColumns={`repeat(${columns}, minmax(90px, 90px))`}
       justifyItems="center"
       gap={4}
       border="1px solid"
@@ -41,15 +48,7 @@ export default function TopSites() {
     onClose: onCloseEditModal,
   } = useDisclosure();
 
-  const [websitesList, setWebsitesList] = useState<WebsiteDataType[]>(() => {
-    if (!localStorage.getItem('websitesList')) {
-      localStorage.setItem('websitesList', JSON.stringify([]));
-    }
-
-    const initialValue = localStorage.getItem('websitesList') ?? '';
-
-    return JSON.parse(initialValue);
-  });
+  const { websitesList, onWebsitesListChange } = useStorageData();
   const [editWebsiteData, setEditWebsiteData] = useState<WebsiteDataType>();
   const [editWebsiteDataKey, setEditWebsiteDataKey] = useState<number>();
 
@@ -61,7 +60,7 @@ export default function TopSites() {
   }
 
   function handleAdd(websiteData: WebsiteDataType) {
-    setWebsitesList([...websitesList, websiteData]);
+    onWebsitesListChange([...websitesList, websiteData]);
 
     onCloseAddModal();
   }
@@ -71,7 +70,7 @@ export default function TopSites() {
       index === editWebsiteDataKey ? websiteData : website,
     );
 
-    setWebsitesList(newWebsitesList);
+    onWebsitesListChange(newWebsitesList);
 
     onCloseEditModal();
   }
@@ -81,7 +80,7 @@ export default function TopSites() {
       (website, index) => index !== key,
     );
 
-    setWebsitesList(newWebsitesList);
+    onWebsitesListChange(newWebsitesList);
   }
 
   useEffect(() => {
@@ -115,7 +114,7 @@ export default function TopSites() {
       <ReactSortable
         tag={WebsitesGrid}
         list={websitesList}
-        setList={setWebsitesList}
+        setList={onWebsitesListChange}
         draggable="#website-container"
       >
         {websitesList?.map((website, key) => (

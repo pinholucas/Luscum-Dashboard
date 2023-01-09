@@ -44,6 +44,7 @@ export type LocationType = {
 };
 
 export type SettingsType = {
+  adaptTopSitesWidth: boolean;
   columns: number;
   appID: string;
   apikey: string;

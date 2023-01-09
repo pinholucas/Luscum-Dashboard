@@ -11,6 +11,7 @@ import {
   ModalOverlay,
   ModalCloseButton,
   useToast,
+  Switch,
 } from '@chakra-ui/react';
 import { SettingsType } from 'entities';
 import { useSettings } from 'hooks/useSettings';
@@ -33,9 +34,9 @@ export default function SettingsManagementModal({
   const initialRef = useRef<HTMLDivElement>(null);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { value, name } = event.currentTarget;
+    const { value, checked, name } = event.currentTarget;
 
-    setNewSettings({ ...newSettings, [name]: value });
+    setNewSettings({ ...newSettings, [name]: checked ?? value });
   }
 
   function handleSave() {
@@ -76,6 +77,23 @@ export default function SettingsManagementModal({
             outline: 'none',
           }}
         >
+          <FormControl
+            display="flex"
+            width="full"
+            justifyContent="space-between"
+          >
+            <FormLabel fontSize="lg">
+              Ajustar tamanho a quantidade de sites
+            </FormLabel>
+            <Switch
+              size="lg"
+              colorScheme="orange"
+              name="adaptTopSitesWidth"
+              isChecked={newSettings.adaptTopSitesWidth}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+
           <FormControl>
             <FormLabel>Número de colunas</FormLabel>
             <Input
@@ -113,7 +131,6 @@ export default function SettingsManagementModal({
             borderColor="alert"
             bg="none"
             color="alert"
-            mr={3}
             _hover={{
               bgColor: 'alert',
               color: 'gray.200',
