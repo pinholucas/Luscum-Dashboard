@@ -33,10 +33,16 @@ export default function SettingsManagementModal({
   const toast = useToast();
   const initialRef = useRef<HTMLDivElement>(null);
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleSwitchChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value, checked, name } = event.currentTarget;
 
     setNewSettings({ ...newSettings, [name]: checked ?? value });
+  }
+
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value, name } = event.currentTarget;
+
+    setNewSettings({ ...newSettings, [name]: value });
   }
 
   function handleSave() {
@@ -85,17 +91,19 @@ export default function SettingsManagementModal({
             <FormLabel fontSize="lg">
               Ajustar tamanho a quantidade de sites
             </FormLabel>
+
             <Switch
               size="lg"
               colorScheme="orange"
               name="adaptTopSitesWidth"
               isChecked={newSettings.adaptTopSitesWidth}
-              onChange={handleInputChange}
+              onChange={handleSwitchChange}
             />
           </FormControl>
 
           <FormControl>
             <FormLabel>Número de colunas</FormLabel>
+
             <Input
               name="columns"
               placeholder="ex: 3"
@@ -106,6 +114,7 @@ export default function SettingsManagementModal({
 
           <FormControl>
             <FormLabel>AppID (AutoSugest)</FormLabel>
+
             <Input
               name="appID"
               placeholder="ex: EF564EGE1616E5BE4B5E4654E46G5E6F4E64F6E4"
@@ -116,6 +125,7 @@ export default function SettingsManagementModal({
 
           <FormControl>
             <FormLabel>APIKey (Weather)</FormLabel>
+
             <Input
               name="apikey"
               placeholder="ex: UH92h982Hj20920Hh930H3h030Voo939j3HJ383hKD"

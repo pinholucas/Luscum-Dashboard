@@ -6,7 +6,7 @@ import TopSites from './TopSites/TopSites';
 import { useHome } from 'hooks/useHome';
 import SettingsWidget from './SettingsWidget';
 
-type videoType = {
+export type videoType = {
   firstFrame: string;
   videoUrl: string;
   copyright: string;
@@ -16,7 +16,7 @@ type videoType = {
 export default function Home() {
   const [videoData, setVideoData] = useState<videoType>();
 
-  const { data, isLoading, error } = useHome();
+  const { data, isLoading, isError } = useHome();
 
   useEffect(() => {
     if (data) {
@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <Flex width="100vw" height="100vh">
-      {error && <Text>Problema no vídeo!</Text>}
+      {isError && <Text>Problema no vídeo!</Text>}
 
       <WeatherWidget />
 

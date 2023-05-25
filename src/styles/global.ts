@@ -63,10 +63,10 @@ export const theme = extendTheme({
     Menu: {
       baseStyle: {
         list: {
+          '--menu-bg': 'colors.background.500',
           padding: 0,
           minWidth: 'max-content',
           borderColor: 'secondaryBackground',
-          bgColor: 'background.600',
           backdropFilter: 'blur(8px)',
           color: 'gray.300',
         },

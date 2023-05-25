@@ -175,10 +175,13 @@ export default function WeatherWidget() {
                 </Text>
               </Flex>
             </PopoverTrigger>
+
             <PopoverContent
               display="grid"
               gridTemplateRows="max-content auto"
-              minHeight="235"
+              minHeight="235px"
+              minWidth="400px"
+              maxWidth="400px"
               bgColor="background.600"
               backdropFilter="blur(4px)"
               borderColor="secondaryBackground"
@@ -264,7 +267,12 @@ export default function WeatherWidget() {
                       <>
                         <Divider my={2} borderColor="secondaryBackground" />
 
-                        <Flex alignItems="center" gap={2}>
+                        <Flex
+                          alignItems="center"
+                          gap={2}
+                          overflow="hidden"
+                          overflowWrap="break-word"
+                        >
                           <IoMdInformationCircleOutline />
                           <Text>{`${data?.nowCasting}`}</Text>
                         </Flex>
