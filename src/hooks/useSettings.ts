@@ -1,15 +1,14 @@
 import { AppContext } from 'context/AppContext';
-import { useContextSelector } from 'use-context-selector';
+import { useContext } from 'react';
 
 export function useSettings() {
-  const settings = useContextSelector(AppContext, (app) => app.settings);
-  const onSettingsChange = useContextSelector(
-    AppContext,
-    (app) => app.onSettingsChange,
-  );
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useSettings must be used within an AppProvider');
+  }
 
   return {
-    settings,
-    onSettingsChange,
+    settings: context.settings,
+    onSettingsChange: context.onSettingsChange,
   };
 }

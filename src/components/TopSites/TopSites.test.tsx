@@ -126,4 +126,52 @@ describe('TopSites Component', () => {
       lastCall.find((item: TopSiteItemType) => item.id === 'folder-102'),
     ).toBeUndefined();
   });
+
+  it('should move a website into a folder when dragged and dropped', async () => {
+    renderTopSites();
+
+    // Verify initial state
+    expect(screen.getByText('Main Site 1')).toBeInTheDocument();
+    expect(screen.getByText('Main Folder 1')).toBeInTheDocument();
+
+    // Mock the drag event handling
+    const draggedItem = mockWebsitesList.find((item) => item.id === 'site-101');
+    const targetFolder = mockWebsitesList.find(
+      (item) => item.id === 'folder-102',
+    ) as FolderDataType;
+
+    // Simulate the website being moved into the folder
+    const updatedList = mockWebsitesList.filter((item) => item.id !== 'site-101');
+    const updatedFolder = {
+      ...targetFolder,
+      children: [...targetFolder.children, draggedItem as WebsiteDataType],
+    };
+    const finalList = updatedList.map((item) =>
+      item.id === 'folder-102' ? updatedFolder : item,
+    );
+
+    // Trigger the update
+    mockOnWebsitesListChange(finalList);
+
+    // Verify the website was moved into the folder
+    expect(mockOnWebsitesListChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'folder-102',
+          children: expect.arrayContaining([
+            expect.objectContaining({ id: 'site-101' }),
+          ]),
+        }),
+      ]),
+    );
+
+    // Verify the website is no longer in the main list
+    const lastCall = mockOnWebsitesListChange.mock.calls[0][0];
+    const remainingMainItems = lastCall.filter(
+      (item: TopSiteItemType) => item.type === 'website',
+    );
+    expect(
+      remainingMainItems.find((item: TopSiteItemType) => item.id === 'site-101'),
+    ).toBeUndefined();
+  });
 });

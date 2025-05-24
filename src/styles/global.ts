@@ -10,6 +10,36 @@ export const theme = extendTheme({
       'html, body': {
         bgColor: 'gray.900',
       },
+
+      // Drag and drop styles
+      '.sortable-ghost': {
+        opacity: '0.4',
+        transform: 'rotate(5deg)',
+      },
+
+      '.sortable-chosen': {
+        opacity: '0.8',
+      },
+
+      '.sortable-drag': {
+        opacity: '0.8',
+        transform: 'rotate(5deg)',
+      },
+
+      '.draggable-item': {
+        transition: 'transform 0.2s ease, opacity 0.2s ease',
+        cursor: 'grab',
+      },
+
+      '.draggable-item:active': {
+        cursor: 'grabbing',
+      },
+
+      // Folder drop zone highlight
+      '[id^="folder-"]:hover': {
+        borderColor: 'rgba(230, 126, 34, 0.8) !important',
+        boxShadow: '0 0 10px rgba(230, 126, 34, 0.3)',
+      },
     },
   },
 

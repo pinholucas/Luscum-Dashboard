@@ -312,6 +312,68 @@ export default function TopSites() {
     onOpenEditModal(); // Opens WebsiteManagementModal
   }
 
+  // Handler for when a website is dropped into a folder via native drag and drop
+  function handleWebsiteDroppedIntoFolder(websiteData: WebsiteDataType, folderId: string) {
+    console.log('Website dropped into folder:', websiteData.id, 'into folder:', folderId);
+    
+    // Remove the website from the main list
+    let processedList = websitesList.filter((i) => i.id !== websiteData.id);
+
+    // Add it to the target folder
+    processedList = processedList.map((item) => {
+      if (item.id === folderId && item.type === 'folder') {
+        const children = (item as FolderDataType).children || [];
+        if (!children.find((child) => child.id === websiteData.id)) {
+          // Avoid duplicates
+          return {
+            ...item,
+            children: [...children, websiteData],
+          };
+        }
+      }
+      return item;
+    });
+
+    onWebsitesListChange(processedList);
+
+    // Update viewingFolder if the website was dragged into it
+    if (viewingFolder && viewingFolder.id === folderId) {
+      const updatedFolder = processedList.find(
+        (f) => f.id === folderId && f.type === 'folder',
+      ) as FolderDataType | undefined;
+      if (updatedFolder) setViewingFolder(updatedFolder);
+    }
+  }
+
+  // Handler for when a website is dropped onto another website to create a new folder
+  function handleWebsiteDroppedOntoWebsite(draggedWebsite: WebsiteDataType, targetWebsite: WebsiteDataType) {
+    console.log('Creating new folder from two websites:', draggedWebsite.id, targetWebsite.id);
+    
+    // Create a new folder with both websites
+    const newFolder: FolderDataType = {
+      id: uuidv4(),
+      title: 'New Folder',
+      children: [targetWebsite, draggedWebsite],
+      type: 'folder',
+    };
+
+    // Remove both websites from the main list and add the new folder
+    let processedList = websitesList.filter(
+      (i) => i.id !== draggedWebsite.id && i.id !== targetWebsite.id
+    );
+
+    // Find the position where the target website was and insert the folder there
+    const targetIndex = websitesList.findIndex((i) => i.id === targetWebsite.id);
+    if (targetIndex !== -1) {
+      processedList.splice(targetIndex, 0, newFolder);
+    } else {
+      // Fallback: add at the end
+      processedList.push(newFolder);
+    }
+
+    onWebsitesListChange(processedList);
+  }
+
   // handleRenameFolder is now handleRenameFolderTrigger which calls handleOpenEditItemModal
 
   // Removed useEffect for localStorage persistence as it's now handled in AppContext.tsx
@@ -364,138 +426,16 @@ export default function TopSites() {
         tag={WebsitesGrid}
         list={websitesList}
         setList={(newListProposedBySortable, sortableInstance, store) => {
-          // Access the event differently to avoid TypeScript error
-          const sortableEvent = (store as any).dragging?.evt;
-
-          if (
-            sortableEvent &&
-            sortableEvent.type === 'end' &&
-            sortableEvent.oldDraggableIndex !== undefined &&
-            sortableEvent.newDraggableIndex !== undefined &&
-            sortableEvent.clientX !== undefined &&
-            sortableEvent.clientY !== undefined &&
-            sortableEvent.item
-          ) {
-            const draggedHTMLElementId: string = sortableEvent.item.id;
-            const actualDraggedItemId = draggedHTMLElementId.replace(
-              /^(website-|folder-)/,
-              '',
-            );
-            const actualDraggedItem = websitesList.find(
-              (i) => i.id === actualDraggedItemId,
-            );
-
-            if (!actualDraggedItem) {
-              const typedState = newListProposedBySortable.map((item) => {
-                const originalItem = websitesList.find(
-                  (orig) => orig.id === (item as any).id,
-                );
-                return {
-                  ...item,
-                  type:
-                    originalItem?.type ||
-                    ((item as any).children ? 'folder' : 'website'),
-                } as TopSiteItemType;
-              });
-              onWebsitesListChange(typedState);
-              return;
-            }
-
-            let potentialFolderTargetElement = document.elementFromPoint(
-              sortableEvent.clientX,
-              sortableEvent.clientY,
-            );
-            while (
-              potentialFolderTargetElement &&
-              potentialFolderTargetElement.parentElement &&
-              !potentialFolderTargetElement.id.startsWith('folder-')
-            ) {
-              potentialFolderTargetElement =
-                potentialFolderTargetElement.parentElement;
-            }
-
-            if (
-              actualDraggedItem.type === 'website' &&
-              potentialFolderTargetElement &&
-              potentialFolderTargetElement.id.startsWith('folder-')
-            ) {
-              const targetFolderDomId = potentialFolderTargetElement.id;
-              const targetFolderId = targetFolderDomId.replace('folder-', '');
-
-              if (actualDraggedItem.id === targetFolderId) {
-                const typedState = newListProposedBySortable.map((item) => {
-                  const originalItem = websitesList.find(
-                    (orig) => orig.id === (item as any).id,
-                  );
-                  return {
-                    ...item,
-                    type:
-                      originalItem?.type ||
-                      ((item as any).children ? 'folder' : 'website'),
-                  } as TopSiteItemType;
-                });
-                onWebsitesListChange(typedState);
-                return;
-              }
-
-              let processedList = websitesList.filter(
-                (i) => i.id !== actualDraggedItem.id,
+          // Handle regular reordering only
+          const reorderedList = newListProposedBySortable
+            .map((sortedItem) => {
+              const fullItem = websitesList.find(
+                (originalItem) => originalItem.id === (sortedItem as any).id,
               );
-
-              processedList = processedList.map((item) => {
-                if (item.id === targetFolderId && item.type === 'folder') {
-                  const children = (item as FolderDataType).children || [];
-                  if (
-                    !children.find((child) => child.id === actualDraggedItem.id)
-                  ) {
-                    // Avoid duplicates
-                    return {
-                      ...item,
-                      children: [
-                        ...children,
-                        actualDraggedItem as WebsiteDataType,
-                      ],
-                    };
-                  }
-                }
-                return item;
-              });
-              onWebsitesListChange(processedList);
-              // Update viewingFolder if the website was dragged into it
-              if (viewingFolder && viewingFolder.id === targetFolderId) {
-                const updatedFolder = processedList.find(
-                  (f) => f.id === targetFolderId && f.type === 'folder',
-                ) as FolderDataType | undefined;
-                if (updatedFolder) setViewingFolder(updatedFolder);
-              }
-            } else {
-              // Standard reorder
-              const reorderedList = newListProposedBySortable
-                .map((sortedItem) => {
-                  const fullItem = websitesList.find(
-                    (originalItem) =>
-                      originalItem.id === (sortedItem as any).id,
-                  );
-                  return fullItem ? fullItem : sortedItem;
-                })
-                .filter(Boolean) as TopSiteItemType[];
-              onWebsitesListChange(reorderedList);
-            }
-          } else {
-            // Fallback for other events or incomplete data
-            const typedState = newListProposedBySortable.map((item) => {
-              const originalItem = websitesList.find(
-                (orig) => orig.id === (item as any).id,
-              );
-              return {
-                ...item,
-                type:
-                  originalItem?.type ||
-                  ((item as any).children ? 'folder' : 'website'),
-              } as TopSiteItemType;
-            });
-            onWebsitesListChange(typedState);
-          }
+              return fullItem ? fullItem : sortedItem;
+            })
+            .filter(Boolean) as TopSiteItemType[];
+          onWebsitesListChange(reorderedList);
         }}
         draggable=".draggable-item"
         animation={200}
@@ -503,6 +443,71 @@ export default function TopSites() {
         ghostClass="sortable-ghost"
         chosenClass="sortable-chosen"
         dragClass="sortable-drag"
+        group={{
+          name: 'top-sites',
+          pull: true,
+          put: true
+        }}
+        sort={true}
+        swapThreshold={0.9}
+        invertSwap={false}
+        onStart={(evt) => {
+          // Add visual feedback when dragging starts
+          if (evt.item) {
+            evt.item.style.opacity = '0.8';
+            const draggedId = evt.item.id;
+            const draggedType = draggedId.startsWith('website-') ? 'website' : 'folder';
+            evt.item.setAttribute('data-dragging-type', draggedType);
+            
+            // Store original item data for folder drops
+            const actualDraggedItemId = draggedId.replace(/^(website-|folder-)/, '');
+            const actualDraggedItem = websitesList.find((i) => i.id === actualDraggedItemId);
+            if (actualDraggedItem) {
+              (evt.item as any)._draggedItemData = actualDraggedItem;
+              // Also store in a global variable as backup
+              (window as any)._currentlyDraggedItem = actualDraggedItem;
+            }
+          }
+        }}
+        onMove={(evt) => {
+          // Allow most moves, only prevent when specifically targeting folder creation
+          const related = evt.related;
+          const dragged = evt.dragged;
+          
+          if (related && dragged) {
+            const relatedIsFolderContainer = related.id?.startsWith('folder-') || 
+                                           related.getAttribute?.('data-type') === 'folder';
+            const relatedIsWebsiteContainer = related.id?.startsWith('website-') || 
+                                             related.getAttribute?.('data-type') === 'website';
+            const draggedIsWebsite = dragged.id?.startsWith('website-');
+            
+            // Always prevent moves onto folders
+            if (draggedIsWebsite && relatedIsFolderContainer) {
+              return false;
+            }
+            
+            // For website-to-website, check if any website is showing center-targeting feedback
+            if (draggedIsWebsite && relatedIsWebsiteContainer) {
+              // Check if any website container is showing the center-targeting visual feedback
+              const websiteShowingCenterFeedback = document.querySelector('[data-type="website"][style*="rgba(230, 126, 34"]');
+              if (websiteShowingCenterFeedback) {
+                // A website is showing folder creation feedback, prevent ReactSortable move
+                return false;
+              }
+            }
+          }
+          return true; // Allow normal reordering in all other cases
+        }}
+        onEnd={(evt) => {
+          // Reset visual feedback when dragging ends
+          if (evt.item) {
+            evt.item.style.opacity = '1';
+            evt.item.removeAttribute('data-dragging-type');
+            delete (evt.item as any)._draggedItemData;
+            // Clean up global backup
+            delete (window as any)._currentlyDraggedItem;
+          }
+        }}
       >
         {websitesList?.map((item) => {
           if (item.type === 'folder') {
@@ -515,6 +520,7 @@ export default function TopSites() {
                 onOpenFolder={() => handleOpenFolderViewer(item.id)} // Changed to Viewer
                 onRenameFolder={() => handleRenameFolderTrigger(item.id)} // Changed to Trigger
                 onRemoveFolder={() => handleRemoveFolder(item.id)}
+                onWebsiteDroppedIntoFolder={handleWebsiteDroppedIntoFolder}
               />
             );
           } else {
@@ -526,6 +532,7 @@ export default function TopSites() {
                 onOpenEditModal={() => handleOpenEditItemModal(item.id, 'main')} // Updated to use new handler
                 onRemove={() => handleRemoveWebsite(item.id)}
                 websiteData={item as WebsiteDataType}
+                onWebsiteDroppedOntoWebsite={handleWebsiteDroppedOntoWebsite}
               />
             );
           }

@@ -1,18 +1,14 @@
 import { AppContext } from 'context/AppContext';
-import { useContextSelector } from 'use-context-selector';
+import { useContext } from 'react';
 
 export function useStorageData() {
-  const websitesList = useContextSelector(
-    AppContext,
-    (app) => app.websitesList,
-  );
-  const onWebsitesListChange = useContextSelector(
-    AppContext,
-    (app) => app.onWebsitesListChange,
-  );
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useStorageData must be used within an AppProvider');
+  }
 
   return {
-    websitesList,
-    onWebsitesListChange,
+    websitesList: context.websitesList,
+    onWebsitesListChange: context.onWebsitesListChange,
   };
 }

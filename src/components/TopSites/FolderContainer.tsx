@@ -23,6 +23,7 @@ interface FolderContainerProps {
   onOpenFolder: () => void;
   onRenameFolder: () => void;
   onRemoveFolder: () => void;
+  onWebsiteDroppedIntoFolder?: (websiteData: WebsiteDataType, folderId: string) => void;
   className?: string;
 }
 
@@ -32,11 +33,13 @@ export default function FolderContainer({
   onOpenFolder,
   onRenameFolder,
   onRemoveFolder,
+  onWebsiteDroppedIntoFolder,
   className,
 }: FolderContainerProps) {
   const { title, children } = folderData;
   const displayChildren = children.slice(0, 4);
   const [isMenuVisible, setIsMenuVisible] = React.useState(false);
+  const [isDragOver, setIsDragOver] = React.useState(false);
 
   const handleMouseEnter = () => {
     setIsMenuVisible(true);
@@ -46,10 +49,82 @@ export default function FolderContainer({
     setIsMenuVisible(false);
   };
 
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const draggedElement = document.querySelector('[data-dragging-type="website"]');
+    if (draggedElement) {
+      const draggedItemData = (draggedElement as any)._draggedItemData;
+      if (draggedItemData && draggedItemData.type === 'website') {
+        setIsDragOver(true);
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const draggedElement = document.querySelector('[data-dragging-type="website"]');
+    if (draggedElement) {
+      const draggedItemData = (draggedElement as any)._draggedItemData;
+      if (draggedItemData && draggedItemData.type === 'website') {
+        e.dataTransfer.dropEffect = 'move';
+      }
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Only clear drag over if we're actually leaving the container
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    console.log('Drop event triggered on FolderContainer');
+
+    // Get the dragged element from the drag event
+    let draggedItemData = null;
+    const draggedElement = document.querySelector('[data-dragging-type="website"]');
+    
+    if (draggedElement) {
+      draggedItemData = (draggedElement as any)._draggedItemData;
+    }
+    
+    // Fallback to global variable
+    if (!draggedItemData) {
+      draggedItemData = (window as any)._currentlyDraggedItem;
+    }
+
+    if (draggedItemData && onWebsiteDroppedIntoFolder) {
+      if (draggedItemData.type === 'website') {
+        console.log('Dropping website into folder:', draggedItemData, folderData.id);
+        onWebsiteDroppedIntoFolder(draggedItemData, folderData.id);
+      }
+    } else {
+      console.log('No dragged element found or handler missing', { draggedItemData, onWebsiteDroppedIntoFolder });
+    }
+  };
+
   return (
     <Flex
       id={id} // Important for ReactSortable
       className={className}
+      data-type="folder" // Add data attribute for easier detection
+      data-folder-id={folderData.id} // Add folder ID as data attribute
       h="120px" // Same as WebsiteContainer
       w="120px" // Same as WebsiteContainer
       bg="rgba(32, 33, 36, 0.8)" // Slightly different or same as WebsiteContainer
@@ -66,6 +141,20 @@ export default function FolderContainer({
       onClick={onOpenFolder}
       gap={2} // Gap between thumbnail area and title
       p={2} // Padding for the container
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      _hover={{
+        borderColor: 'rgba(230, 126, 34, 0.6)',
+        boxShadow: '0 0 8px rgba(230, 126, 34, 0.3)',
+      }}
+      // Visual feedback when dragging over
+      style={{
+        borderColor: isDragOver ? 'rgba(230, 126, 34, 1)' : undefined,
+        boxShadow: isDragOver ? '0 0 12px rgba(230, 126, 34, 0.6)' : undefined,
+        backgroundColor: isDragOver ? 'rgba(230, 126, 34, 0.1)' : undefined,
+      }}
     >
       {/* Context Menu */}
       <Menu>

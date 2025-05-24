@@ -1,6 +1,5 @@
-import { SettingsType, WebsiteDataType, TopSiteItemType } from 'entities'; // Import TopSiteItemType
-import { useState } from 'react';
-import { createContext } from 'use-context-selector';
+import React, { useState, createContext } from 'react';
+import { SettingsType, TopSiteItemType } from 'entities'; // Import TopSiteItemType
 import { getSettingsData } from 'utils';
 
 type AppContextType = {
@@ -10,12 +9,44 @@ type AppContextType = {
   onSettingsChange: (settings: SettingsType) => void;
 };
 
-export const AppContext = createContext({} as AppContextType);
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [websitesList, setWebsitesList] = useState<TopSiteItemType[]>(() => { // Updated type
     if (!localStorage.getItem('websitesList')) {
-      localStorage.setItem('websitesList', JSON.stringify([]));
+      // Add some sample websites for testing drag and drop
+      const sampleWebsites: TopSiteItemType[] = [
+        {
+          id: 'website-1',
+          title: 'Google',
+          url: 'https://google.com',
+          type: 'website',
+          icon: undefined
+        },
+        {
+          id: 'website-2',
+          title: 'GitHub',
+          url: 'https://github.com',
+          type: 'website',
+          icon: undefined
+        },
+        {
+          id: 'website-3',
+          title: 'YouTube',
+          url: 'https://youtube.com',
+          type: 'website',
+          icon: undefined
+        },
+        {
+          id: 'website-4',
+          title: 'Stack Overflow',
+          url: 'https://stackoverflow.com',
+          type: 'website',
+          icon: undefined
+        }
+      ];
+      localStorage.setItem('websitesList', JSON.stringify(sampleWebsites));
+      return sampleWebsites;
     }
 
     const initialValue = localStorage.getItem('websitesList') ?? '';
