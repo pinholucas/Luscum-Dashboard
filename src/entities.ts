@@ -35,7 +35,17 @@ export type WebsiteDataType = {
   title?: string;
   icon?: string;
   url?: string;
+  type: 'website';
 };
+
+export type FolderDataType = {
+  id: string;
+  title: string;
+  children: WebsiteDataType[];
+  type: 'folder';
+};
+
+export type TopSiteItemType = WebsiteDataType | FolderDataType;
 
 export type LocationType = {
   lat: number;

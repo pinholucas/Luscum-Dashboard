@@ -1,11 +1,11 @@
-import { SettingsType, WebsiteDataType } from 'entities';
+import { SettingsType, WebsiteDataType, TopSiteItemType } from 'entities'; // Import TopSiteItemType
 import { useState } from 'react';
 import { createContext } from 'use-context-selector';
 import { getSettingsData } from 'utils';
 
 type AppContextType = {
-  websitesList: WebsiteDataType[];
-  onWebsitesListChange: (websitesList: WebsiteDataType[]) => void;
+  websitesList: TopSiteItemType[]; // Updated type
+  onWebsitesListChange: (items: TopSiteItemType[]) => void; // Updated type and param name
   settings: SettingsType;
   onSettingsChange: (settings: SettingsType) => void;
 };
@@ -13,18 +13,26 @@ type AppContextType = {
 export const AppContext = createContext({} as AppContextType);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [websitesList, setWebsitesList] = useState<WebsiteDataType[]>(() => {
+  const [websitesList, setWebsitesList] = useState<TopSiteItemType[]>(() => { // Updated type
     if (!localStorage.getItem('websitesList')) {
       localStorage.setItem('websitesList', JSON.stringify([]));
     }
 
     const initialValue = localStorage.getItem('websitesList') ?? '';
-
-    return JSON.parse(initialValue);
+    try {
+      const parsedValue = JSON.parse(initialValue);
+      // Basic validation to ensure it's an array; could be more robust
+      return Array.isArray(parsedValue) ? parsedValue : [];
+    } catch (error) {
+      console.error("Error parsing websitesList from localStorage", error);
+      return []; // Fallback to empty array on error
+    }
   });
 
-  const onWebsiteListChange = (websitesList: WebsiteDataType[]) => {
-    setWebsitesList(websitesList);
+  // Renamed and updated function
+  const onTopSiteItemsChange = (items: TopSiteItemType[]) => {
+    setWebsitesList(items);
+    localStorage.setItem('websitesList', JSON.stringify(items)); // Added persistence
   };
 
   const [settings, setSettings] = useState<SettingsType>(() => {
@@ -33,13 +41,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const onSettingsChange = (settings: SettingsType) => {
     setSettings(settings);
+    localStorage.setItem('settings', JSON.stringify(settings)); // Assuming settings should also persist
   };
 
   return (
     <AppContext.Provider
       value={{
         websitesList,
-        onWebsitesListChange: onWebsiteListChange,
+        onWebsitesListChange: onTopSiteItemsChange, // Updated name
         settings,
         onSettingsChange,
       }}
