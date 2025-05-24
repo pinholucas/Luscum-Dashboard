@@ -1,4 +1,16 @@
-import { Flex, Grid, Image, Menu, MenuButton, MenuItem, MenuList, Text, Icon, IconButton } from '@chakra-ui/react';
+import React from 'react';
+import {
+  Flex,
+  Grid,
+  Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+  Icon,
+  IconButton,
+} from '@chakra-ui/react';
 import { BiDotsHorizontalRounded } from 'react-icons/bi';
 import { FiTrash, FiEdit2 } from 'react-icons/fi';
 import { FaFolder } from 'react-icons/fa';
@@ -11,6 +23,7 @@ interface FolderContainerProps {
   onOpenFolder: () => void;
   onRenameFolder: () => void;
   onRemoveFolder: () => void;
+  className?: string;
 }
 
 export default function FolderContainer({
@@ -19,6 +32,7 @@ export default function FolderContainer({
   onOpenFolder,
   onRenameFolder,
   onRemoveFolder,
+  className,
 }: FolderContainerProps) {
   const { title, children } = folderData;
   const displayChildren = children.slice(0, 4);
@@ -35,6 +49,7 @@ export default function FolderContainer({
   return (
     <Flex
       id={id} // Important for ReactSortable
+      className={className}
       h="120px" // Same as WebsiteContainer
       w="120px" // Same as WebsiteContainer
       bg="rgba(32, 33, 36, 0.8)" // Slightly different or same as WebsiteContainer
@@ -97,7 +112,13 @@ export default function FolderContainer({
       </Menu>
 
       {/* Folder Thumbnail Area & Title */}
-      <Flex flexDirection="column" alignItems="center" justifyContent="center" flexGrow={1} gap={1}>
+      <Flex
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        flexGrow={1}
+        gap={1}
+      >
         {children.length === 0 ? (
           <Icon as={FaFolder} boxSize="48px" color="gray.400" /> // Empty folder icon, slightly larger
         ) : (
@@ -143,6 +164,3 @@ export default function FolderContainer({
     </Flex>
   );
 }
-
-// Need to import React for useState
-import React from 'react';

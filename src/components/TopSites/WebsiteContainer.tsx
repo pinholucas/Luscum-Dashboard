@@ -19,6 +19,7 @@ interface WebsiteContainerProps {
   onOpenEditModal: () => void;
   onRemove: () => void;
   websiteData: WebsiteDataType;
+  className?: string;
 }
 
 export default function WebsiteContainer({
@@ -26,11 +27,13 @@ export default function WebsiteContainer({
   onOpenEditModal,
   onRemove,
   websiteData,
+  className,
 }: WebsiteContainerProps) {
   return (
     <>
       <Flex
         id={id}
+        className={className}
         position="relative"
         height="80px"
         width="90px"

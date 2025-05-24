@@ -1,8 +1,12 @@
 import { Flex, Grid, Icon, useDisclosure, Text } from '@chakra-ui/react';
 import { IoIosAdd } from 'react-icons/io';
 import { FaFolder } from 'react-icons/fa';
-import { WebsiteDataType, FolderDataType, TopSiteItemType } from '../../entities'; // Updated import
-import { forwardRef, useEffect, useState } from 'react';
+import {
+  WebsiteDataType,
+  FolderDataType,
+  TopSiteItemType,
+} from '../../entities'; // Updated import
+import { forwardRef, useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { v4 as uuidv4 } from 'uuid'; // For unique IDs
 
@@ -15,23 +19,24 @@ import { useSettings } from 'hooks/useSettings';
 import { useStorageData } from 'hooks/useStorageData';
 
 type EditingItemContextType = // Renamed from EditingWebsiteContextType for clarity
-  | { type: 'main'; itemId: string }
-  | { type: 'folder_child'; folderId: string; itemId: string };
+
+    | { type: 'main'; itemId: string }
+    | { type: 'folder_child'; folderId: string; itemId: string };
 
 const WebsitesGrid = forwardRef<HTMLDivElement, any>((props, ref) => {
   const { settings } = useSettings();
   // Assuming websitesList from useStorageData will be TopSiteItemType[]
-  const { websitesList }: { websitesList: TopSiteItemType[] } = useStorageData();
+  const { websitesList }: { websitesList: TopSiteItemType[] } =
+    useStorageData();
 
   const itemCount = websitesList.length + 2; // +1 for add website, +1 for add folder
   const columns =
     itemCount < settings.columns && settings.adaptTopSitesWidth
       ? itemCount
       : settings.columns;
-  
+
   // Clamp columns to a minimum of 1 if itemCount is 0, to avoid invalid gridTemplateColumns
   const displayColumns = Math.max(1, columns);
-
 
   return (
     <Grid
@@ -71,38 +76,53 @@ export default function TopSites() {
 
   // websitesList is now TopSiteItemType[]
   const { websitesList, onWebsitesListChange } = useStorageData();
-  
+
   // State for the item being edited (website or folder) in WebsiteManagementModal
-  const [editingItemData, setEditingItemData] = useState<TopSiteItemType | undefined>(undefined);
+  const [editingItemData, setEditingItemData] = useState<
+    TopSiteItemType | undefined
+  >(undefined);
   // Context for editing: 'main' for top-level items, 'folder_child' for items within a folder.
   // Includes itemId for clarity, though editingItemData?.id could also be used.
-  const [editingItemContext, setEditingItemContext] = useState<EditingItemContextType | null>(null);
-  
-  const [viewingFolder, setViewingFolder] = useState<FolderDataType | null>(null);
+  const [editingItemContext, setEditingItemContext] =
+    useState<EditingItemContextType | null>(null);
 
+  const [viewingFolder, setViewingFolder] = useState<FolderDataType | null>(
+    null,
+  );
 
   // Opens the WebsiteManagementModal for editing an existing item (website or folder)
-  function handleOpenEditItemModal(itemId: string, contextType: 'main' | 'folder_child', folderIdIfChild?: string) {
-    const itemToEdit = contextType === 'main' 
-      ? websitesList.find(item => item.id === itemId)
-      : viewingFolder?.children.find(child => child.id === itemId); // Assuming editing child from open folder view
+  function handleOpenEditItemModal(
+    itemId: string,
+    contextType: 'main' | 'folder_child',
+    folderIdIfChild?: string,
+  ) {
+    const itemToEdit =
+      contextType === 'main'
+        ? websitesList.find((item) => item.id === itemId)
+        : viewingFolder?.children.find((child) => child.id === itemId); // Assuming editing child from open folder view
 
     if (itemToEdit) {
       setEditingItemData(itemToEdit);
       if (contextType === 'main') {
         setEditingItemContext({ type: 'main', itemId: itemToEdit.id });
       } else if (contextType === 'folder_child' && folderIdIfChild) {
-        setEditingItemContext({ type: 'folder_child', folderId: folderIdIfChild, itemId: itemToEdit.id });
+        setEditingItemContext({
+          type: 'folder_child',
+          folderId: folderIdIfChild,
+          itemId: itemToEdit.id,
+        });
       }
       onOpenEditModal(); // This opens the WebsiteManagementModal configured for 'edit'
     } else {
-      console.error("Item to edit not found:", itemId);
+      console.error('Item to edit not found:', itemId);
     }
   }
-  
+
   // Specifically for the "Rename" option on FolderContainer's context menu
   function handleRenameFolderTrigger(folderId: string) {
-    const folderToRename = websitesList.find(item => item.id === folderId && item.type === 'folder');
+    const folderToRename = websitesList.find(
+      (item) => item.id === folderId && item.type === 'folder',
+    );
     if (folderToRename) {
       setEditingItemData(folderToRename);
       // When renaming a folder itself, the context is 'main' because it's a top-level item.
@@ -111,10 +131,10 @@ export default function TopSites() {
     }
   }
 
-
   // Submit handler for adding a NEW website (from WebsiteManagementModal in 'add' mode)
   function handleAddWebsiteSubmit(data: WebsiteManagementSubmitData) {
-    if (data.type === 'website' && !('id' in data)) { // Ensure it's for adding a new website
+    if (data.type === 'website' && !('id' in data)) {
+      // Ensure it's for adding a new website
       const newWebsite: WebsiteDataType = {
         ...data, // title, url, icon from modal
         id: uuidv4(), // Generate new ID
@@ -123,11 +143,15 @@ export default function TopSites() {
       onWebsitesListChange([...websitesList, newWebsite]);
       onCloseAddModal();
     } else {
-      console.error("handleAddWebsiteSubmit called with invalid data type or for an existing item", data);
+      console.error(
+        'handleAddWebsiteSubmit called with invalid data type or for an existing item',
+        data,
+      );
     }
   }
-  
-  function handleAddFolder() { // Adds a new folder to the main list
+
+  function handleAddFolder() {
+    // Adds a new folder to the main list
     const newFolder: FolderDataType = {
       id: uuidv4(),
       title: 'New Folder',
@@ -140,38 +164,56 @@ export default function TopSites() {
   // Submit handler for editing an EXISTING item (website or folder)
   // (from WebsiteManagementModal in 'edit' mode)
   function handleEditItemSubmit(submittedData: WebsiteManagementSubmitData) {
-    if (!editingItemContext || !editingItemData || !('id' in submittedData) || submittedData.id !== editingItemData.id) {
-      console.error("Editing context not set correctly or ID mismatch.", editingItemContext, editingItemData, submittedData);
+    if (
+      !editingItemContext ||
+      !editingItemData ||
+      !('id' in submittedData) ||
+      submittedData.id !== editingItemData.id
+    ) {
+      console.error(
+        'Editing context not set correctly or ID mismatch.',
+        editingItemContext,
+        editingItemData,
+        submittedData,
+      );
       onCloseEditModal();
       return;
     }
 
     if (submittedData.type === 'folder' && editingItemContext.type === 'main') {
       // Editing a Folder's Title
-      const updatedWebsitesList = websitesList.map(item =>
+      const updatedWebsitesList = websitesList.map((item) =>
         item.id === submittedData.id && item.type === 'folder'
           ? { ...item, title: submittedData.title }
-          : item
+          : item,
       );
       onWebsitesListChange(updatedWebsitesList);
       if (viewingFolder?.id === submittedData.id) {
-        setViewingFolder(prev => prev ? { ...prev, title: submittedData.title } : null);
+        setViewingFolder((prev) =>
+          prev ? { ...prev, title: submittedData.title } : null,
+        );
       }
     } else if (submittedData.type === 'website') {
       // Editing a Website (either main or in folder)
-      const updatedWebsite = { ...editingItemData, ...submittedData, type: 'website' } as WebsiteDataType;
-      
+      const updatedWebsite = {
+        ...editingItemData,
+        ...submittedData,
+        type: 'website',
+      } as WebsiteDataType;
+
       if (editingItemContext.type === 'main') {
-        const newWebsitesList = websitesList.map(item =>
-          item.id === updatedWebsite.id ? updatedWebsite : item
+        const newWebsitesList = websitesList.map((item) =>
+          item.id === updatedWebsite.id ? updatedWebsite : item,
         );
         onWebsitesListChange(newWebsitesList);
       } else if (editingItemContext.type === 'folder_child') {
         const { folderId } = editingItemContext;
-        const folderToUpdate = websitesList.find(item => item.id === folderId && item.type === 'folder') as FolderDataType | undefined;
+        const folderToUpdate = websitesList.find(
+          (item) => item.id === folderId && item.type === 'folder',
+        ) as FolderDataType | undefined;
         if (folderToUpdate) {
-          const updatedChildren = folderToUpdate.children.map(child =>
-            child.id === updatedWebsite.id ? updatedWebsite : child
+          const updatedChildren = folderToUpdate.children.map((child) =>
+            child.id === updatedWebsite.id ? updatedWebsite : child,
           );
           handleUpdateFolderChildren(folderId, updatedChildren);
         }
@@ -180,27 +222,28 @@ export default function TopSites() {
     onCloseEditModal();
   }
 
-  function handleRemoveWebsite(websiteId: string) { // Removes from main list (not used for folder children here)
+  function handleRemoveWebsite(websiteId: string) {
+    // Removes from main list (not used for folder children here)
     const newWebsitesList = websitesList.filter(
       (item) => item.id !== websiteId,
     );
     onWebsitesListChange(newWebsitesList);
   }
 
-  function handleRemoveFolder(folderId: string) { // Removes a folder from the main list
-    const newWebsitesList = websitesList.filter(
-      (item) => item.id !== folderId,
-    );
+  function handleRemoveFolder(folderId: string) {
+    // Removes a folder from the main list
+    const newWebsitesList = websitesList.filter((item) => item.id !== folderId);
     onWebsitesListChange(newWebsitesList);
-    if (viewingFolder?.id === folderId) { 
+    if (viewingFolder?.id === folderId) {
       onCloseFolderViewModal();
       setViewingFolder(null);
     }
   }
-  
+
   // --- FolderViewModal Related Handlers ---
 
-  function handleOpenFolderViewer(folderId: string) { // Renamed for clarity from handleOpenFolder
+  function handleOpenFolderViewer(folderId: string) {
+    // Renamed for clarity from handleOpenFolder
     const folderToView = websitesList.find(
       (item) => item.id === folderId && item.type === 'folder',
     ) as FolderDataType | undefined;
@@ -212,14 +255,22 @@ export default function TopSites() {
     }
   }
 
-  const handleLaunchWebsite = (url: string) => { // Used by FolderViewModal
+  const handleLaunchWebsite = (url: string) => {
+    // Used by FolderViewModal
     if (url) {
-      window.open(url.startsWith('http') ? url : `https://${url}`, '_blank', 'noopener,noreferrer');
+      window.open(
+        url.startsWith('http') ? url : `https://${url}`,
+        '_blank',
+        'noopener,noreferrer',
+      );
     }
   };
 
   // This function is called by FolderViewModal to update its children (e.g., after reordering or removal)
-  function handleUpdateFolderChildren(folderId: string, newChildren: WebsiteDataType[]) {
+  function handleUpdateFolderChildren(
+    folderId: string,
+    newChildren: WebsiteDataType[],
+  ) {
     const updatedWebsitesList = websitesList.map((item) => {
       if (item.id === folderId && item.type === 'folder') {
         return { ...item, children: newChildren };
@@ -228,23 +279,36 @@ export default function TopSites() {
     });
     onWebsitesListChange(updatedWebsitesList);
     if (viewingFolder && viewingFolder.id === folderId) {
-      setViewingFolder(prev => prev ? { ...prev, children: newChildren } : null);
+      setViewingFolder((prev) =>
+        prev ? { ...prev, children: newChildren } : null,
+      );
     }
   }
 
   // Called by FolderViewModal when removing a website from within the folder
   function handleRemoveWebsiteFromFolder(websiteId: string, folderId: string) {
-    const folder = websitesList.find(item => item.id === folderId && item.type === 'folder') as FolderDataType | undefined;
+    const folder = websitesList.find(
+      (item) => item.id === folderId && item.type === 'folder',
+    ) as FolderDataType | undefined;
     if (folder) {
-      const updatedChildren = folder.children.filter(child => child.id !== websiteId);
+      const updatedChildren = folder.children.filter(
+        (child) => child.id !== websiteId,
+      );
       handleUpdateFolderChildren(folderId, updatedChildren);
     }
   }
-  
+
   // Called by FolderViewModal to trigger editing a website shown within the folder
-  function handleEditWebsiteInFolderTrigger(website: WebsiteDataType, folderId: string) {
+  function handleEditWebsiteInFolderTrigger(
+    website: WebsiteDataType,
+    folderId: string,
+  ) {
     setEditingItemData(website); // The website data is the item to edit
-    setEditingItemContext({ type: 'folder_child', folderId: folderId, itemId: website.id });
+    setEditingItemContext({
+      type: 'folder_child',
+      folderId: folderId,
+      itemId: website.id,
+    });
     onOpenEditModal(); // Opens WebsiteManagementModal
   }
 
@@ -260,8 +324,8 @@ export default function TopSites() {
       justifyContent="center"
       position="absolute"
       zIndex={2}
-      overflowY="auto" 
-      p={4} 
+      overflowY="auto"
+      p={4}
     >
       {/* Modal for ADDING a new website */}
       <WebsiteManagementModal
@@ -272,7 +336,7 @@ export default function TopSites() {
       />
 
       {/* Modal for EDITING an existing website OR folder */}
-      <WebsiteManagementModal 
+      <WebsiteManagementModal
         type="edit"
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -291,7 +355,6 @@ export default function TopSites() {
           setViewingFolder(null);
         }}
         folder={viewingFolder}
-        onUpdateFolderChildren={handleUpdateFolderChildren}
         onLaunchWebsite={handleLaunchWebsite}
         onEditWebsiteInFolder={handleEditWebsiteInFolderTrigger} // Changed to trigger
         onRemoveWebsiteFromFolder={handleRemoveWebsiteFromFolder}
@@ -301,52 +364,97 @@ export default function TopSites() {
         tag={WebsitesGrid}
         list={websitesList}
         setList={(newListProposedBySortable, sortableInstance, store) => {
-          const event = store.dragging?.props?.event;
+          // Access the event differently to avoid TypeScript error
+          const sortableEvent = (store as any).dragging?.evt;
 
-          if (event && event.type === 'end' && event.oldDraggableIndex !== undefined && event.newDraggableIndex !== undefined && event.clientX !== undefined && event.clientY !== undefined && event.item) {
-            const draggedHTMLElementId: string = event.item.id; 
-            const actualDraggedItemId = draggedHTMLElementId.replace(/^(website-|folder-)/, '');
-            const actualDraggedItem = websitesList.find(i => i.id === actualDraggedItemId);
+          if (
+            sortableEvent &&
+            sortableEvent.type === 'end' &&
+            sortableEvent.oldDraggableIndex !== undefined &&
+            sortableEvent.newDraggableIndex !== undefined &&
+            sortableEvent.clientX !== undefined &&
+            sortableEvent.clientY !== undefined &&
+            sortableEvent.item
+          ) {
+            const draggedHTMLElementId: string = sortableEvent.item.id;
+            const actualDraggedItemId = draggedHTMLElementId.replace(
+              /^(website-|folder-)/,
+              '',
+            );
+            const actualDraggedItem = websitesList.find(
+              (i) => i.id === actualDraggedItemId,
+            );
 
             if (!actualDraggedItem) {
-              const typedState = newListProposedBySortable.map(item => {
-                const originalItem = websitesList.find(orig => orig.id === (item as any).id);
-                return { ...item, type: originalItem?.type || ((item as any).children ? 'folder' : 'website') } as TopSiteItemType;
+              const typedState = newListProposedBySortable.map((item) => {
+                const originalItem = websitesList.find(
+                  (orig) => orig.id === (item as any).id,
+                );
+                return {
+                  ...item,
+                  type:
+                    originalItem?.type ||
+                    ((item as any).children ? 'folder' : 'website'),
+                } as TopSiteItemType;
               });
               onWebsitesListChange(typedState);
               return;
             }
-            
-            let potentialFolderTargetElement = document.elementFromPoint(event.clientX, event.clientY);
-            while (potentialFolderTargetElement && potentialFolderTargetElement.parentElement && !potentialFolderTargetElement.id.startsWith('folder-')) {
-              potentialFolderTargetElement = potentialFolderTargetElement.parentElement;
+
+            let potentialFolderTargetElement = document.elementFromPoint(
+              sortableEvent.clientX,
+              sortableEvent.clientY,
+            );
+            while (
+              potentialFolderTargetElement &&
+              potentialFolderTargetElement.parentElement &&
+              !potentialFolderTargetElement.id.startsWith('folder-')
+            ) {
+              potentialFolderTargetElement =
+                potentialFolderTargetElement.parentElement;
             }
 
-            if (actualDraggedItem.type === 'website' &&
-                potentialFolderTargetElement &&
-                potentialFolderTargetElement.id.startsWith('folder-')) {
-              
+            if (
+              actualDraggedItem.type === 'website' &&
+              potentialFolderTargetElement &&
+              potentialFolderTargetElement.id.startsWith('folder-')
+            ) {
               const targetFolderDomId = potentialFolderTargetElement.id;
               const targetFolderId = targetFolderDomId.replace('folder-', '');
 
               if (actualDraggedItem.id === targetFolderId) {
-                 const typedState = newListProposedBySortable.map(item => {
-                    const originalItem = websitesList.find(orig => orig.id === (item as any).id);
-                    return { ...item, type: originalItem?.type || ((item as any).children ? 'folder' : 'website') } as TopSiteItemType;
-                  });
+                const typedState = newListProposedBySortable.map((item) => {
+                  const originalItem = websitesList.find(
+                    (orig) => orig.id === (item as any).id,
+                  );
+                  return {
+                    ...item,
+                    type:
+                      originalItem?.type ||
+                      ((item as any).children ? 'folder' : 'website'),
+                  } as TopSiteItemType;
+                });
                 onWebsitesListChange(typedState);
                 return;
               }
-              
-              let processedList = websitesList.filter(i => i.id !== actualDraggedItem.id);
 
-              processedList = processedList.map(item => {
+              let processedList = websitesList.filter(
+                (i) => i.id !== actualDraggedItem.id,
+              );
+
+              processedList = processedList.map((item) => {
                 if (item.id === targetFolderId && item.type === 'folder') {
                   const children = (item as FolderDataType).children || [];
-                  if (!children.find(child => child.id === actualDraggedItem.id)) { // Avoid duplicates
+                  if (
+                    !children.find((child) => child.id === actualDraggedItem.id)
+                  ) {
+                    // Avoid duplicates
                     return {
                       ...item,
-                      children: [...children, actualDraggedItem as WebsiteDataType],
+                      children: [
+                        ...children,
+                        actualDraggedItem as WebsiteDataType,
+                      ],
                     };
                   }
                 }
@@ -355,23 +463,36 @@ export default function TopSites() {
               onWebsitesListChange(processedList);
               // Update viewingFolder if the website was dragged into it
               if (viewingFolder && viewingFolder.id === targetFolderId) {
-                 const updatedFolder = processedList.find(f => f.id === targetFolderId && f.type === 'folder') as FolderDataType | undefined;
-                 if(updatedFolder) setViewingFolder(updatedFolder);
+                const updatedFolder = processedList.find(
+                  (f) => f.id === targetFolderId && f.type === 'folder',
+                ) as FolderDataType | undefined;
+                if (updatedFolder) setViewingFolder(updatedFolder);
               }
-
             } else {
               // Standard reorder
-              const reorderedList = newListProposedBySortable.map(sortedItem => {
-                const fullItem = websitesList.find(originalItem => originalItem.id === (sortedItem as any).id);
-                return fullItem ? fullItem : sortedItem; 
-              }).filter(Boolean) as TopSiteItemType[];
+              const reorderedList = newListProposedBySortable
+                .map((sortedItem) => {
+                  const fullItem = websitesList.find(
+                    (originalItem) =>
+                      originalItem.id === (sortedItem as any).id,
+                  );
+                  return fullItem ? fullItem : sortedItem;
+                })
+                .filter(Boolean) as TopSiteItemType[];
               onWebsitesListChange(reorderedList);
             }
           } else {
             // Fallback for other events or incomplete data
-            const typedState = newListProposedBySortable.map(item => {
-              const originalItem = websitesList.find(orig => orig.id === (item as any).id);
-              return { ...item, type: originalItem?.type || ((item as any).children ? 'folder' : 'website') } as TopSiteItemType;
+            const typedState = newListProposedBySortable.map((item) => {
+              const originalItem = websitesList.find(
+                (orig) => orig.id === (item as any).id,
+              );
+              return {
+                ...item,
+                type:
+                  originalItem?.type ||
+                  ((item as any).children ? 'folder' : 'website'),
+              } as TopSiteItemType;
             });
             onWebsitesListChange(typedState);
           }
@@ -379,15 +500,15 @@ export default function TopSites() {
         draggable=".draggable-item"
         animation={200}
         delay={2}
-        ghostClass="sortable-ghost" 
-        chosenClass="sortable-chosen" 
-        dragClass="sortable-drag" 
+        ghostClass="sortable-ghost"
+        chosenClass="sortable-chosen"
+        dragClass="sortable-drag"
       >
-        {websitesList?.map((item) => { 
+        {websitesList?.map((item) => {
           if (item.type === 'folder') {
             return (
               <FolderContainer
-                className="draggable-item" 
+                className="draggable-item"
                 id={`folder-${item.id}`}
                 key={item.id}
                 folderData={item as FolderDataType}
@@ -396,7 +517,7 @@ export default function TopSites() {
                 onRemoveFolder={() => handleRemoveFolder(item.id)}
               />
             );
-          } else { 
+          } else {
             return (
               <WebsiteContainer
                 className="draggable-item"
@@ -409,7 +530,7 @@ export default function TopSites() {
             );
           }
         })}
-        
+
         {/* "Add New Website" Button - Triggers 'add' mode of WebsiteManagementModal */}
         <Flex
           className="add-button" // Not draggable
@@ -430,7 +551,9 @@ export default function TopSites() {
           title="Add new website"
         >
           <Icon as={IoIosAdd} boxSize="32px" color="whiteAlpha.600" />
-          <Text fontSize="xs" color="whiteAlpha.700">Add Website</Text>
+          <Text fontSize="xs" color="whiteAlpha.700">
+            Add Website
+          </Text>
         </Flex>
 
         {/* Add New Folder Button */}
@@ -453,7 +576,9 @@ export default function TopSites() {
           title="Add new folder"
         >
           <Icon as={FaFolder} boxSize="28px" color="whiteAlpha.600" />
-          <Text fontSize="xs" color="whiteAlpha.700">Add Folder</Text>
+          <Text fontSize="xs" color="whiteAlpha.700">
+            Add Folder
+          </Text>
         </Flex>
       </ReactSortable>
     </Flex>

@@ -14,7 +14,7 @@ import {
   Grid,
   Box,
 } from '@chakra-ui/react';
-import { FiTrash2, FiEdit2, FiExternalLink } from 'react-icons/fi'; // Using FiExternalLink for launch
+import { FiTrash2, FiExternalLink } from 'react-icons/fi'; // Using FiExternalLink for launch
 import { FolderDataType, WebsiteDataType } from '../../entities';
 import { getIconURL } from '../../utils';
 import React from 'react'; // Needed for React.FC if used, or general JSX
@@ -63,7 +63,10 @@ const FolderViewModal: React.FC<FolderViewModalProps> = ({
               This folder is empty.
             </Text>
           ) : (
-            <Grid templateColumns="repeat(auto-fill, minmax(180px, 1fr))" gap={4}>
+            <Grid
+              templateColumns="repeat(auto-fill, minmax(180px, 1fr))"
+              gap={4}
+            >
               {folder.children.map((website) => (
                 <Flex
                   key={website.id}
@@ -76,10 +79,10 @@ const FolderViewModal: React.FC<FolderViewModalProps> = ({
                   position="relative"
                   _hover={{ bg: 'gray.600' }}
                 >
-                  <Flex 
-                    align="center" 
-                    justify="center" 
-                    w="100%" 
+                  <Flex
+                    align="center"
+                    justify="center"
+                    w="100%"
                     h="80px" // Fixed height for icon area
                     cursor="pointer"
                     onClick={() => onLaunchWebsite(website.url || '')}
@@ -105,7 +108,7 @@ const FolderViewModal: React.FC<FolderViewModalProps> = ({
                     {website.title || 'Untitled Website'}
                   </Text>
                   <Flex position="absolute" bottom="5px" right="5px" gap={1}>
-                     {/* Edit button - deferred for now
+                    {/* Edit button - deferred for now
                     <IconButton
                       aria-label="Edit website"
                       icon={<FiEdit2 />}
@@ -126,17 +129,17 @@ const FolderViewModal: React.FC<FolderViewModalProps> = ({
                       _hover={{ bg: 'whiteAlpha.200' }}
                     />
                   </Flex>
-                   <Box 
+                  <Box
                     as={FiExternalLink}
                     position="absolute"
                     top="5px"
                     right="5px"
                     cursor="pointer"
                     color="gray.400"
-                    _hover={{ color: "whiteAlpha.800"}}
-                    onClick={(e) => {
-                        e.stopPropagation(); // Prevent Flex click if icon is part of it
-                        onLaunchWebsite(website.url || '');
+                    _hover={{ color: 'whiteAlpha.800' }}
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation(); // Prevent Flex click if icon is part of it
+                      onLaunchWebsite(website.url || '');
                     }}
                   />
                 </Flex>
@@ -145,7 +148,11 @@ const FolderViewModal: React.FC<FolderViewModalProps> = ({
           )}
         </ModalBody>
         <ModalFooter borderTopWidth="1px" borderColor="gray.700">
-          <Button onClick={onClose} variant="outline" _hover={{ bg: 'whiteAlpha.100' }}>
+          <Button
+            onClick={onClose}
+            variant="outline"
+            _hover={{ bg: 'whiteAlpha.100' }}
+          >
             Close
           </Button>
         </ModalFooter>
