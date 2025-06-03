@@ -53,20 +53,9 @@ export default function FolderModal({
           <ReactSortable
             group="websites"
             list={folder.children || []}
+            setList={onChange}
             tag={FolderGrid}
             draggable="#website-container"
-            onSort={(evt) => {
-              const newChildren = [...(folder.children || [])];
-              if (
-                evt.oldIndex !== undefined &&
-                evt.newIndex !== undefined &&
-                evt.oldIndex !== evt.newIndex
-              ) {
-                const [item] = newChildren.splice(evt.oldIndex, 1);
-                newChildren.splice(evt.newIndex, 0, item);
-                onChange(newChildren);
-              }
-            }}
             onEnd={(evt: any) => {
               const rect = modalRef.current?.getBoundingClientRect();
               const e = evt.originalEvent as MouseEvent;
