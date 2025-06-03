@@ -38,10 +38,29 @@ export default function FolderModal({
       justifyContent="center"
       gap={4}
       ref={ref}
+      {...props}
     >
       {props.children}
     </Grid>
   ));
+
+  function handleDragEnd(evt: any) {
+    const rect = modalRef.current?.getBoundingClientRect();
+    const e = evt.originalEvent as MouseEvent;
+    if (
+      rect &&
+      (e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom)
+    ) {
+      const index = evt.oldIndex;
+      const item = folder.children?.[index];
+      if (item) {
+        onMoveOut(item);
+      }
+    }
+  }
 
 
   return (
@@ -57,39 +76,11 @@ export default function FolderModal({
             setList={onChange}
             tag={FolderGrid}
             draggable="#website-container"
-            onEnd={(evt: any) => {
-              const rect = modalRef.current?.getBoundingClientRect();
-              const e = evt.originalEvent as MouseEvent;
-              if (
-                rect &&
-                (e.clientX < rect.left ||
-                  e.clientX > rect.right ||
-                  e.clientY < rect.top ||
-                  e.clientY > rect.bottom)
-              ) {
-                const index = evt.oldIndex;
-                const item = folder.children?.[index];
-                if (item) {
-                  onMoveOut(item);
-                }
-                return;
-              }
-
-              if (
-                typeof evt.oldIndex === 'number' &&
-                typeof evt.newIndex === 'number' &&
-                evt.oldIndex !== evt.newIndex
-              ) {
-                const children = [...(folder.children || [])];
-                const [moved] = children.splice(evt.oldIndex, 1);
-                children.splice(evt.newIndex, 0, moved);
-                onChange(children);
-              }
-            }}
+            onEnd={handleDragEnd}
           >
             {folder.children?.map((site, idx) => (
               <WebsiteContainer
-                key={idx}
+                key={site.id}
                 id="website-container"
                 dataId={site.id}
                 onOpenEditModal={() => onEdit(site, idx)}
