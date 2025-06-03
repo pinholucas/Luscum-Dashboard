@@ -43,12 +43,6 @@ export default function FolderModal({
     </Grid>
   ));
 
-  function handleSort(evt: any) {
-    const children = [...(folder.children || [])];
-    const [moved] = children.splice(evt.oldIndex, 1);
-    children.splice(evt.newIndex, 0, moved);
-    onChange(children);
-  }
 
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
@@ -78,9 +72,20 @@ export default function FolderModal({
                 if (item) {
                   onMoveOut(item);
                 }
+                return;
+              }
+
+              if (
+                typeof evt.oldIndex === 'number' &&
+                typeof evt.newIndex === 'number' &&
+                evt.oldIndex !== evt.newIndex
+              ) {
+                const children = [...(folder.children || [])];
+                const [moved] = children.splice(evt.oldIndex, 1);
+                children.splice(evt.newIndex, 0, moved);
+                onChange(children);
               }
             }}
-            onSort={handleSort}
           >
             {folder.children?.map((site, idx) => (
               <WebsiteContainer
