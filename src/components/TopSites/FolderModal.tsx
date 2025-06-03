@@ -43,6 +43,13 @@ export default function FolderModal({
     </Grid>
   ));
 
+  function handleSort(evt: any) {
+    const children = [...(folder.children || [])];
+    const [moved] = children.splice(evt.oldIndex, 1);
+    children.splice(evt.newIndex, 0, moved);
+    onChange(children);
+  }
+
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
@@ -73,6 +80,7 @@ export default function FolderModal({
                 }
               }
             }}
+            onSort={handleSort}
           >
             {folder.children?.map((site, idx) => (
               <WebsiteContainer
