@@ -35,6 +35,7 @@ export type WebsiteDataType = {
   title?: string;
   icon?: string;
   url?: string;
+  children?: WebsiteDataType[];
 };
 
 export type LocationType = {
