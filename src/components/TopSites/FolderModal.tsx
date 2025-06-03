@@ -10,13 +10,14 @@ import {
 import { ReactSortable } from 'react-sortablejs';
 import WebsiteContainer from './WebsiteContainer';
 import { WebsiteDataType } from 'entities';
-import { forwardRef } from 'react';
+import { forwardRef, useRef } from 'react';
 
 interface FolderModalProps {
   isOpen: boolean;
   onClose: () => void;
   folder: WebsiteDataType;
   onChange: (list: WebsiteDataType[]) => void;
+  onMoveOut: (item: WebsiteDataType) => void;
 }
 
 export default function FolderModal({
@@ -24,7 +25,9 @@ export default function FolderModal({
   onClose,
   folder,
   onChange,
+  onMoveOut,
 }: FolderModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
   const FolderGrid = forwardRef<HTMLDivElement, any>((props, ref) => (
     <Grid
       templateColumns="repeat(4, 90px)"
@@ -39,7 +42,7 @@ export default function FolderModal({
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent ref={modalRef}>
         <ModalHeader>{folder.title ?? 'Pasta'}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -48,6 +51,23 @@ export default function FolderModal({
             list={folder.children || []}
             setList={onChange}
             tag={FolderGrid}
+            onEnd={(evt: any) => {
+              const rect = modalRef.current?.getBoundingClientRect();
+              const e = evt.originalEvent as MouseEvent;
+              if (
+                rect &&
+                (e.clientX < rect.left ||
+                  e.clientX > rect.right ||
+                  e.clientY < rect.top ||
+                  e.clientY > rect.bottom)
+              ) {
+                const index = evt.oldIndex;
+                const item = folder.children?.[index];
+                if (item) {
+                  onMoveOut(item);
+                }
+              }
+            }}
           >
             {folder.children?.map((site, idx) => (
               <WebsiteContainer

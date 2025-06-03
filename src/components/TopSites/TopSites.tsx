@@ -112,6 +112,18 @@ export default function TopSites() {
     const folder = { ...newList[openedFolderKey], children };
     newList[openedFolderKey] = folder;
     onWebsitesListChange(newList);
+    setOpenedFolder(folder);
+  }
+
+  function handleMoveOutOfFolder(item: WebsiteDataType) {
+    if (openedFolderKey === null) return;
+    const newList = [...websitesList];
+    const folder = { ...newList[openedFolderKey] };
+    folder.children = folder.children?.filter((c) => c.id !== item.id);
+    newList[openedFolderKey] = folder;
+    newList.push(item);
+    onWebsitesListChange(newList);
+    setOpenedFolder(folder);
   }
 
   function handleDragStart() {
@@ -261,6 +273,7 @@ export default function TopSites() {
           onClose={handleCloseFolder}
           folder={openedFolder}
           onChange={handleFolderChildrenChange}
+          onMoveOut={handleMoveOutOfFolder}
         />
       )}
     </Flex>
