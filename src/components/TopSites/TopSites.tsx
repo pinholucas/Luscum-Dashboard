@@ -53,14 +53,22 @@ export default function TopSites() {
   const { websitesList, onWebsitesListChange } = useStorageData();
   const [editWebsiteData, setEditWebsiteData] = useState<WebsiteDataType>();
   const [editWebsiteDataKey, setEditWebsiteDataKey] = useState<number>();
+  const [isEditFolder, setIsEditFolder] = useState(false);
   const [previousList, setPreviousList] = useState<WebsiteDataType[]>([]);
   const [openedFolder, setOpenedFolder] = useState<WebsiteDataType | null>(null);
+  const [openedFolderKey, setOpenedFolderKey] = useState<number | null>(null);
+
+  function handleCloseEditModal() {
+    onCloseEditModal();
+    setIsEditFolder(false);
+  }
 
   function handleOnOpenEditModal(websiteData: WebsiteDataType, key: number) {
     onOpenEditModal();
 
     setEditWebsiteData(websiteData);
     setEditWebsiteDataKey(key);
+    setIsEditFolder(!!websiteData.children);
   }
 
   function handleAdd(websiteData: WebsiteDataType) {
@@ -77,6 +85,7 @@ export default function TopSites() {
     onWebsitesListChange(newWebsitesList);
 
     onCloseEditModal();
+    setIsEditFolder(false);
   }
 
   function handleRemove(key: number) {
@@ -87,12 +96,22 @@ export default function TopSites() {
     onWebsitesListChange(newWebsitesList);
   }
 
-  function handleOpenFolder(folder: WebsiteDataType) {
+  function handleOpenFolder(folder: WebsiteDataType, key: number) {
     setOpenedFolder(folder);
+    setOpenedFolderKey(key);
   }
 
   function handleCloseFolder() {
     setOpenedFolder(null);
+    setOpenedFolderKey(null);
+  }
+
+  function handleFolderChildrenChange(children: WebsiteDataType[]) {
+    if (openedFolderKey === null) return;
+    const newList = [...websitesList];
+    const folder = { ...newList[openedFolderKey], children };
+    newList[openedFolderKey] = folder;
+    onWebsitesListChange(newList);
   }
 
   function handleDragStart() {
@@ -124,19 +143,31 @@ export default function TopSites() {
     const targetIndex = oldList.findIndex((w) => w.id === targetId);
     if (dragIndex === -1 || targetIndex === -1) return;
 
-    const folder: WebsiteDataType = {
-      id: nanoid(),
-      title: 'Pasta',
-      children: [oldList[targetIndex], oldList[dragIndex]],
-    };
+    const dragItem = oldList[dragIndex];
+    const targetItem = oldList[targetIndex];
 
-    if (dragIndex > targetIndex) {
+    if (targetItem.children) {
+      if (dragItem.children) return;
+      targetItem.children = [...(targetItem.children || []), dragItem];
       oldList.splice(dragIndex, 1);
-      oldList.splice(targetIndex, 1, folder);
+      oldList[targetIndex] = targetItem;
+    } else if (!dragItem.children) {
+      const folder: WebsiteDataType = {
+        id: nanoid(),
+        title: 'Pasta',
+        children: [targetItem, dragItem],
+      };
+
+      if (dragIndex > targetIndex) {
+        oldList.splice(dragIndex, 1);
+        oldList.splice(targetIndex, 1, folder);
+      } else {
+        oldList.splice(targetIndex, 1);
+        oldList.splice(dragIndex, 1);
+        oldList.splice(targetIndex, 0, folder);
+      }
     } else {
-      oldList.splice(targetIndex, 1);
-      oldList.splice(dragIndex, 1);
-      oldList.splice(targetIndex, 0, folder);
+      return;
     }
 
     onWebsitesListChange(oldList);
@@ -165,15 +196,17 @@ export default function TopSites() {
       <WebsiteManagementModal
         type="edit"
         isOpen={isEditModalOpen}
-        onClose={onCloseEditModal}
+        onClose={handleCloseEditModal}
         onSubmit={handleEdit}
         websiteData={editWebsiteData}
+        isFolder={isEditFolder}
       />
 
       <ReactSortable
         tag={WebsitesGrid}
         list={websitesList}
         setList={onWebsitesListChange}
+        group="websites"
         draggable="#website-container"
         onStart={handleDragStart}
         onEnd={handleDragEnd}
@@ -186,7 +219,7 @@ export default function TopSites() {
             onOpenEditModal={() => handleOnOpenEditModal(website, key)}
             onRemove={() => handleRemove(key)}
             websiteData={website}
-            onOpenFolder={() => handleOpenFolder(website)}
+            onOpenFolder={() => handleOpenFolder(website, key)}
           />
         ))}
 
@@ -227,6 +260,7 @@ export default function TopSites() {
           isOpen={!!openedFolder}
           onClose={handleCloseFolder}
           folder={openedFolder}
+          onChange={handleFolderChildrenChange}
         />
       )}
     </Flex>

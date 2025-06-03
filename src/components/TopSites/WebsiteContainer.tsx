@@ -75,7 +75,7 @@ export default function WebsiteContainer({
           </MenuButton>
           <MenuList>
             <MenuItem icon={<FiEdit2 />} onClick={onOpenEditModal}>
-              Editar
+              {websiteData.children ? 'Renomear' : 'Editar'}
             </MenuItem>
             <MenuItem icon={<FiTrash />} onClick={onRemove}>
               Remover
@@ -94,7 +94,22 @@ export default function WebsiteContainer({
             h="100%"
             onClick={onOpenFolder}
           >
-            <Icon as={BsFolder} boxSize="40px" color="yellow.400" />
+            <Flex
+              width="40px"
+              height="40px"
+              flexWrap="wrap"
+              borderRadius={4}
+              overflow="hidden"
+            >
+              {websiteData.children.slice(0, 4).map((site, idx) => (
+                <Image
+                  key={idx}
+                  width="20px"
+                  height="20px"
+                  src={site.icon ?? getIconURL(site.url!)}
+                />
+              ))}
+            </Flex>
             <Text
               width="75px"
               color="white"

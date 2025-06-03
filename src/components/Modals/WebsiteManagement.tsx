@@ -23,6 +23,7 @@ interface WebsiteManagementModalProps {
   onClose: () => void;
   onSubmit: (data: WebsiteDataType) => void;
   websiteData?: WebsiteDataType;
+  isFolder?: boolean;
 }
 
 export default function WebsiteManagementModal({
@@ -31,6 +32,7 @@ export default function WebsiteManagementModal({
   onClose,
   onSubmit,
   websiteData,
+  isFolder,
 }: WebsiteManagementModalProps) {
   const [website, setWebsite] = useState<WebsiteDataType | null>();
 
@@ -66,7 +68,9 @@ export default function WebsiteManagementModal({
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
-          {`${type === 'add' ? 'Adicionar' : 'Editar'} site`}
+          {isFolder
+            ? `${type === 'add' ? 'Adicionar' : 'Renomear'} pasta`
+            : `${type === 'add' ? 'Adicionar' : 'Editar'} site`}
         </ModalHeader>
         <ModalBody pb={6}>
           {(website?.url || website?.icon) && (
@@ -77,15 +81,17 @@ export default function WebsiteManagementModal({
             />
           )}
 
-          <FormControl mt={4}>
-            <FormLabel>Ícone Personalizado (opcional)</FormLabel>
-            <Input
-              name="icon"
-              placeholder="ex: https://example.com"
-              value={website?.icon}
-              onChange={handleInputChange}
-            />
-          </FormControl>
+          {!isFolder && (
+            <FormControl mt={4}>
+              <FormLabel>Ícone Personalizado (opcional)</FormLabel>
+              <Input
+                name="icon"
+                placeholder="ex: https://example.com"
+                value={website?.icon}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+          )}
 
           <FormControl mt={4}>
             <FormLabel>Título</FormLabel>
@@ -97,15 +103,17 @@ export default function WebsiteManagementModal({
             />
           </FormControl>
 
-          <FormControl mt={4}>
-            <FormLabel>Url</FormLabel>
-            <Input
-              name="url"
-              placeholder="ex: https://example.com"
-              value={website?.url}
-              onChange={handleInputChange}
-            />
-          </FormControl>
+          {!isFolder && (
+            <FormControl mt={4}>
+              <FormLabel>Url</FormLabel>
+              <Input
+                name="url"
+                placeholder="ex: https://example.com"
+                value={website?.url}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+          )}
         </ModalBody>
 
         <ModalFooter>
