@@ -54,6 +54,7 @@ export default function TopSites() {
   const [editWebsiteData, setEditWebsiteData] = useState<WebsiteDataType>();
   const [editWebsiteDataKey, setEditWebsiteDataKey] = useState<number>();
   const [isEditFolder, setIsEditFolder] = useState(false);
+  const [editWebsiteDataFolderKey, setEditWebsiteDataFolderKey] = useState<number | null>(null);
   const [previousList, setPreviousList] = useState<WebsiteDataType[]>([]);
   const [openedFolder, setOpenedFolder] = useState<WebsiteDataType | null>(null);
   const [openedFolderKey, setOpenedFolderKey] = useState<number | null>(null);
@@ -61,6 +62,7 @@ export default function TopSites() {
   function handleCloseEditModal() {
     onCloseEditModal();
     setIsEditFolder(false);
+    setEditWebsiteDataFolderKey(null);
   }
 
   function handleOnOpenEditModal(websiteData: WebsiteDataType, key: number) {
@@ -69,6 +71,17 @@ export default function TopSites() {
     setEditWebsiteData(websiteData);
     setEditWebsiteDataKey(key);
     setIsEditFolder(!!websiteData.children);
+    setEditWebsiteDataFolderKey(null);
+  }
+
+  function handleOnOpenEditModalChild(websiteData: WebsiteDataType, key: number) {
+    if (openedFolderKey === null) return;
+    onOpenEditModal();
+
+    setEditWebsiteData(websiteData);
+    setEditWebsiteDataKey(key);
+    setEditWebsiteDataFolderKey(openedFolderKey);
+    setIsEditFolder(false);
   }
 
   function handleAdd(websiteData: WebsiteDataType) {
@@ -78,11 +91,23 @@ export default function TopSites() {
   }
 
   function handleEdit(websiteData: WebsiteDataType) {
-    const newWebsitesList = websitesList.map((website, index) =>
-      index === editWebsiteDataKey ? websiteData : website,
-    );
-
-    onWebsitesListChange(newWebsitesList);
+    if (editWebsiteDataFolderKey !== null) {
+      const newList = [...websitesList];
+      const folder = { ...newList[editWebsiteDataFolderKey] };
+      folder.children = folder.children?.map((child, idx) =>
+        idx === editWebsiteDataKey ? websiteData : child,
+      );
+      newList[editWebsiteDataFolderKey] = folder;
+      onWebsitesListChange(newList);
+      if (openedFolderKey === editWebsiteDataFolderKey) {
+        setOpenedFolder(folder);
+      }
+    } else {
+      const newWebsitesList = websitesList.map((website, index) =>
+        index === editWebsiteDataKey ? websiteData : website,
+      );
+      onWebsitesListChange(newWebsitesList);
+    }
 
     onCloseEditModal();
     setIsEditFolder(false);
@@ -94,6 +119,16 @@ export default function TopSites() {
     );
 
     onWebsitesListChange(newWebsitesList);
+  }
+
+  function handleRemoveChild(key: number) {
+    if (openedFolderKey === null) return;
+    const newList = [...websitesList];
+    const folder = { ...newList[openedFolderKey] };
+    folder.children = folder.children?.filter((_, idx) => idx !== key);
+    newList[openedFolderKey] = folder;
+    onWebsitesListChange(newList);
+    setOpenedFolder(folder);
   }
 
   function handleOpenFolder(folder: WebsiteDataType, key: number) {
@@ -274,6 +309,8 @@ export default function TopSites() {
           folder={openedFolder}
           onChange={handleFolderChildrenChange}
           onMoveOut={handleMoveOutOfFolder}
+          onEdit={handleOnOpenEditModalChild}
+          onRemove={handleRemoveChild}
         />
       )}
     </Flex>

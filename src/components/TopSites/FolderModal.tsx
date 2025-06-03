@@ -18,6 +18,8 @@ interface FolderModalProps {
   folder: WebsiteDataType;
   onChange: (list: WebsiteDataType[]) => void;
   onMoveOut: (item: WebsiteDataType) => void;
+  onEdit: (data: WebsiteDataType, index: number) => void;
+  onRemove: (index: number) => void;
 }
 
 export default function FolderModal({
@@ -26,6 +28,8 @@ export default function FolderModal({
   folder,
   onChange,
   onMoveOut,
+  onEdit,
+  onRemove,
 }: FolderModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const FolderGrid = forwardRef<HTMLDivElement, any>((props, ref) => (
@@ -51,6 +55,7 @@ export default function FolderModal({
             list={folder.children || []}
             setList={onChange}
             tag={FolderGrid}
+            draggable="#website-container"
             onEnd={(evt: any) => {
               const rect = modalRef.current?.getBoundingClientRect();
               const e = evt.originalEvent as MouseEvent;
@@ -74,8 +79,8 @@ export default function FolderModal({
                 key={idx}
                 id="website-container"
                 dataId={site.id}
-                onOpenEditModal={() => {}}
-                onRemove={() => {}}
+                onOpenEditModal={() => onEdit(site, idx)}
+                onRemove={() => onRemove(idx)}
                 websiteData={site}
               />
             ))}
