@@ -1,11 +1,11 @@
-import { SettingsType, WebsiteDataType } from 'entities';
+import { SettingsType, TopSiteDataType } from 'entities';
 import { useState } from 'react';
 import { createContext } from 'use-context-selector';
 import { getSettingsData } from 'utils';
 
 type AppContextType = {
-  websitesList: WebsiteDataType[];
-  onWebsitesListChange: (websitesList: WebsiteDataType[]) => void;
+  websitesList: TopSiteDataType[];
+  onWebsitesListChange: (websitesList: TopSiteDataType[]) => void;
   settings: SettingsType;
   onSettingsChange: (settings: SettingsType) => void;
 };
@@ -13,7 +13,7 @@ type AppContextType = {
 export const AppContext = createContext({} as AppContextType);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [websitesList, setWebsitesList] = useState<WebsiteDataType[]>(() => {
+  const [websitesList, setWebsitesList] = useState<TopSiteDataType[]>(() => {
     if (!localStorage.getItem('websitesList')) {
       localStorage.setItem('websitesList', JSON.stringify([]));
     }
@@ -23,7 +23,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return JSON.parse(initialValue);
   });
 
-  const onWebsiteListChange = (websitesList: WebsiteDataType[]) => {
+  const onWebsiteListChange = (websitesList: TopSiteDataType[]) => {
     setWebsitesList(websitesList);
   };
 

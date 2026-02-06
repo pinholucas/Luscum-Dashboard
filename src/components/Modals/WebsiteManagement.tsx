@@ -40,6 +40,7 @@ export default function WebsiteManagementModal({
 
     setWebsite({
       ...website,
+      type: 'website',
       id: id,
       [name]: value === '' ? null : value,
     });
@@ -58,8 +59,17 @@ export default function WebsiteManagementModal({
   }
 
   useEffect(() => {
+    if (type === 'add') {
+      setWebsite({
+        type: 'website',
+        id: nanoid(),
+      });
+
+      return;
+    }
+
     setWebsite(websiteData);
-  }, [websiteData]);
+  }, [type, websiteData]);
 
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose}>
