@@ -31,11 +31,21 @@ export type NTPType = {
 };
 
 export type WebsiteDataType = {
+  type: 'website';
   id: string;
   title?: string;
   icon?: string;
   url?: string;
 };
+
+export type FolderDataType = {
+  type: 'folder';
+  id: string;
+  title: string;
+  websites: WebsiteDataType[];
+};
+
+export type TopSiteDataType = WebsiteDataType | FolderDataType;
 
 export type LocationType = {
   lat: number;
