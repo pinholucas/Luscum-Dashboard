@@ -69,7 +69,7 @@ export default function WebsiteManagementModal({
     }
 
     setWebsite(websiteData);
-  }, [type, websiteData]);
+  }, [type, websiteData, isOpen]);
 
   return (
     <Modal isCentered isOpen={isOpen} onClose={onClose}>

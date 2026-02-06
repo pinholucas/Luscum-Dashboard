@@ -19,6 +19,7 @@ interface WebsiteContainerProps {
   onOpenEditModal: () => void;
   onRemove: () => void;
   websiteData: WebsiteDataType;
+  isMergeTarget?: boolean;
 }
 
 export default function WebsiteContainer({
@@ -26,11 +27,13 @@ export default function WebsiteContainer({
   onOpenEditModal,
   onRemove,
   websiteData,
+  isMergeTarget = false,
 }: WebsiteContainerProps) {
   return (
     <>
       <Flex
         id={id}
+        data-website-id={websiteData.id}
         position="relative"
         height="80px"
         width="90px"
@@ -38,12 +41,17 @@ export default function WebsiteContainer({
         maxWidth="105px"
         backgroundColor="secondaryBackground"
         border="1px solid"
-        borderColor="gray.600"
+        borderColor={isMergeTarget ? 'blue.400' : 'gray.600'}
         borderRadius={8}
         cursor="pointer"
         userSelect={'none'}
+        transform={isMergeTarget ? 'scale(1.08)' : undefined}
+        boxShadow={
+          isMergeTarget ? '0 0 16px 2px rgba(66,153,225,0.45)' : undefined
+        }
+        transition="transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease"
         _hover={{
-          borderColor: 'gray.500',
+          borderColor: isMergeTarget ? 'blue.400' : 'gray.500',
           '& > button': {
             visibility: 'visible',
           },
